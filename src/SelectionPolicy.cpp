@@ -111,7 +111,7 @@ SustainabilitySelection *SustainabilitySelection::clone() const
 {
     return new SustainabilitySelection(*this);
 }
-const string EconomySelection::toString() const
+const string SustainabilitySelection::toString() const
 {
     return "Sustainable Selection";
 }

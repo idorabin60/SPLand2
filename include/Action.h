@@ -134,7 +134,7 @@ class BackupSimulation : public BaseAction {
 class RestoreSimulation : public BaseAction {
     public:
         RestoreSimulation();
-        void act(Simulation &simulation) override;
+         void act(Simulation &simulation) override;
         RestoreSimulation *clone() const override;
         const string toString() const override;
     private:

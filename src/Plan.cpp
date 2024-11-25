@@ -66,29 +66,43 @@ void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy)
 {
     selectionPolicy = newSelectionPolicy;
 }
-void Plan::step() 
+void Plan::step()
 {
-    if (status == PlanStatus::BUSY) {
+    if (status == PlanStatus::BUSY)
+    {
         // If the status of the plan is busy, iterate through all facilities and step them
-        for (int i = 0; i < underConstruction.size(); ++i) {
-            if (underConstruction[i]->step() == FacilityStatus::OPERATIONAL) {
-                facilities.push_back(underConstruction[i]); // Move the facility to operational list
+        for (int i = 0; i < underConstruction.size(); ++i)
+        {
+            if (underConstruction[i]->step() == FacilityStatus::OPERATIONAL)
+            {
+                facilities.push_back(underConstruction[i]);             // Move the facility to operational list
                 underConstruction.erase(underConstruction.begin() + i); // Remove the facility from underConstruction
-                --i; // Decrement to avoid skipping the next element after erase
+                --i;                                                    // Decrement to avoid skipping the next element after erase
             }
         }
+<<<<<<< HEAD
     } 
     else { //The status is available 
     int facility_capacity = (int)settlement.getType() - underConstruction.size();
     for (int i=0; i<facility_capacity;i++){
         Facility* new_facility =  new Facility((selectionPolicy->selectFacility(facilityOptions)),settlement.getName());
          underConstruction.push_back(new_facility);
+=======
+>>>>>>> e1741300d7911c1a7dcc75fddc87ea38f3950a76
     }
+    else
+    { // The status is available
+        int faccility_capacitiy = (int)settlement.getType() - underConstruction.size();
+        for (int i = 0; i < faccility_capacitiy; i++)
+        {
+            const FacilityType &selectedFacilityType = selectionPolicy->selectFacility(facilityOptions);
+            underConstruction.push_back(selectedFacilityType);
+        }
     }
     // Update plan status
     if ((int)underConstruction.size() != (int)settlement.getType())
         status = PlanStatus::AVALIABLE;
-    else 
+    else
         status = PlanStatus::BUSY;
 }
 

@@ -20,11 +20,13 @@ public:
     const int getEnvironmentScore() const;                                                                                               // done                                                                                             // done
     void setSelectionPolicy(SelectionPolicy *selectionPolicy);
     void step();
-    void printStatus();                              // done
-    const vector<Facility *> &getFacilities() const; // done
-    void addFacility(Facility *facility);            // done
+    void printStatus();
+    const vector<Facility *> &getFacilities() const;
+    void addFacility(Facility *facility);
     const string toString() const;
     Plan(const Plan &other);
+    Plan &operator=(const Plan &other);
+    ~Plan();
 
 private:
     int plan_id;

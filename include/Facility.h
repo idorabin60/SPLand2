@@ -27,6 +27,7 @@ public:
     int getEnvironmentScore() const;
     int getEconomyScore() const;
     FacilityCategory getCategory() const;
+    virtual FacilityType *clone() const;
 
 protected:
     const string name;
@@ -49,7 +50,7 @@ public:
     void setStatus(FacilityStatus status);
     const FacilityStatus &getStatus() const;
     const string toString() const;
-    Facility *clone() const;
+    Facility *clone() const override;
 
 private:
     const string settlementName;

@@ -32,6 +32,11 @@ FacilityCategory FacilityType::getCategory() const
 {
     return category;
 }
+FacilityType *FacilityType::clone() const
+{
+    // Return a new instance of FacilityType
+    return new FacilityType(*this);
+}
 
 // class Facility
 Facility::Facility(const string &name, const string &settlementName, const FacilityCategory category,

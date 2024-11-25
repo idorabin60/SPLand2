@@ -100,3 +100,17 @@ Plan::Plan(const Plan &other)
         underConstruction.push_back(other.underConstruction.at(i)->clone());
     }
 }
+Plan::~Plan()
+{
+    delete selectionPolicy;
+
+    for (Facility *facility : facilities)
+    {
+        delete facility;
+    }
+
+    for (Facility *facility : underConstruction)
+    {
+        delete facility;
+    }
+}

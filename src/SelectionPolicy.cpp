@@ -30,10 +30,6 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
     int minDifference = std::numeric_limits<int>::max(); // Initialize to a very large number
     const FacilityType *bestFacility = nullptr;
 
-    int bestLifeQualityScore = LifeQualityScore;
-    int bestEconomyScore = EconomyScore;
-    int bestEnvironmentScore = EnvironmentScore;
-
     for (const FacilityType &facility : facilitiesOptions)
     {
         int tempLifeQualityScore = LifeQualityScore + facility.getEconomyScore();
@@ -48,10 +44,6 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
         {
             minDifference = diff;
             bestFacility = &facility;
-
-            bestLifeQualityScore = tempLifeQualityScore;
-            bestEconomyScore = tempEconomyScore;
-            bestEnvironmentScore = tempEnvironmentScore;
         }
     }
 

@@ -15,14 +15,14 @@ class Plan
 {
 public:
     Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions); // done
-    const int getlifeQualityScore() const;                                                                                               // done
-    const int getEconomyScore() const;                                                                                                   // done
-    const int getEnvironmentScore() const;                                                                                               // done
+    const int getlifeQualityScore() const;                                                                                               // done                                                                                            // done
+    const int getEconomyScore() const;                                                                                                   // done                                                                                                  // done
+    const int getEnvironmentScore() const;                                                                                               // done                                                                                             // done
     void setSelectionPolicy(SelectionPolicy *selectionPolicy);
     void step();
     void printStatus();                              // done
-    const vector<Facility *> &getFacilities() const; // pending
-    void addFacility(Facility *facility);            // pending
+    const vector<Facility *> &getFacilities() const; // done
+    void addFacility(Facility *facility);            // done
     const string toString() const;                   // done
 
 private:

@@ -2,6 +2,7 @@
 #include "Facility.h"
 #include "SelectionPolicy.h"
 #include <algorithm> // For std::min and std::max
+#include <stdexcept>
 
 using std::vector;
 // NaiveSelection Implementation
@@ -69,19 +70,32 @@ BalancedSelection *BalancedSelection::clone() const
 EconomySelection::EconomySelection() : lastSelectedIndex(0) {};
 const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
 {
-    int maxEconemyScore = 0;
-    const FacilityType *bestFacility = nullptr;
-
-    for (const FacilityType &facility : facilitiesOptions)
+    if (facilitiesOptions.empty())
     {
-        if (facility.getEconomyScore() > maxEconemyScore)
+        throw std::runtime_error("No facilities available to select from.");
+    }
+
+    for (int i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
+    {
+        if (facilitiesOptions[i].getCategory() == FacilityCategory::ECONOMY)
         {
-            maxEconemyScore = facility.getEconomyScore();
-            bestFacility = &facility;
+            lastSelectedIndex = (i + 1) % facilitiesOptions.size(); // Update to the next index
+            return facilitiesOptions[i];
         }
     }
-    return *bestFacility;
+
+    for (int i = 0; i < lastSelectedIndex; i++)
+    {
+        if (facilitiesOptions[i].getCategory() == FacilityCategory::ECONOMY)
+        {
+            lastSelectedIndex = (i + 1) % facilitiesOptions.size(); // Update to the next index
+            return facilitiesOptions[i];
+        }
+    }
+
+    throw std::runtime_error("No facility with the correct category found.");
 }
+
 EconomySelection *EconomySelection::clone() const
 {
     return new EconomySelection(*this);
@@ -94,19 +108,32 @@ const string EconomySelection::toString() const
 SustainabilitySelection::SustainabilitySelection() : lastSelectedIndex(0) {};
 const FacilityType &SustainabilitySelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
 {
-    int maxSustainScore = 0;
-    const FacilityType *bestFacility = nullptr;
-
-    for (const FacilityType &facility : facilitiesOptions)
+    if (facilitiesOptions.empty())
     {
-        if (facility.getEconomyScore() > maxSustainScore)
+        throw std::runtime_error("No facilities available to select from.");
+    }
+
+    for (int i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
+    {
+        if (facilitiesOptions[i].getCategory() == FacilityCategory::ENVIRONMENT)
         {
-            maxSustainScore = facility.getEnvironmentScore();
-            bestFacility = &facility;
+            lastSelectedIndex = (i + 1) % facilitiesOptions.size(); // Update to the next index
+            return facilitiesOptions[i];
         }
     }
-    return *bestFacility;
+
+    for (int i = 0; i < lastSelectedIndex; i++)
+    {
+        if (facilitiesOptions[i].getCategory() == FacilityCategory::ENVIRONMENT)
+        {
+            lastSelectedIndex = (i + 1) % facilitiesOptions.size(); // Update to the next index
+            return facilitiesOptions[i];
+        }
+    }
+
+    throw std::runtime_error("No facility with the correct category found.");
 }
+
 SustainabilitySelection *SustainabilitySelection::clone() const
 {
     return new SustainabilitySelection(*this);

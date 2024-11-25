@@ -25,7 +25,6 @@ public:
     void addFacility(Facility *facility);
     const string toString() const;
     Plan(const Plan &other);
-    Plan &operator=(const Plan &other);
     ~Plan();
 
 private:

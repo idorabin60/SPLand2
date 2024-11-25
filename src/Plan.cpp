@@ -66,6 +66,30 @@ void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy)
 {
     selectionPolicy = newSelectionPolicy;
 }
+void Plan::step() 
+{
+    if (status == PlanStatus::BUSY) {
+        // If the status of the plan is busy, iterate through all facilities and step them
+        for (int i = 0; i < underConstruction.size(); ++i) {
+            if (underConstruction[i]->step() == FacilityStatus::OPERATIONAL) {
+                facilities.push_back(underConstruction[i]); // Move the facility to operational list
+                underConstruction.erase(underConstruction.begin() + i); // Remove the facility from underConstruction
+                --i; // Decrement to avoid skipping the next element after erase
+            }
+        }
+    } 
+    else { //The status is available 
+    int temp = (int)status - (int)settlement.getType();
+    for (int i=0; i<temp;i++){
+         underConstruction.push_back(const_cast<Facility*>(selectionPolicy->selectFacility(facilityOptions));
+    }
+    }
+    // Update plan status
+    if ((int)underConstruction.size() != (int)settlement.getType())
+        status = PlanStatus::AVALIABLE;
+    else 
+        status = PlanStatus::BUSY;
+}
 
 // Convert Plan object to a string representation
 const std::string Plan::toString() const
@@ -100,6 +124,7 @@ Plan::Plan(const Plan &other)
         underConstruction.push_back(other.underConstruction.at(i)->clone());
     }
 }
+
 Plan::~Plan()
 {
     delete selectionPolicy;

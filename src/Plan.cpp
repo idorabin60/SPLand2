@@ -79,9 +79,10 @@ void Plan::step()
         }
     } 
     else { //The status is available 
-    int temp = (int)status - (int)settlement.getType();
-    for (int i=0; i<temp;i++){
-         underConstruction.push_back(const_cast<Facility*>(selectionPolicy->selectFacility(facilityOptions));
+    int facility_capacity = (int)settlement.getType() - underConstruction.size();
+    for (int i=0; i<facility_capacity;i++){
+        Facility* new_facility =  new Facility((selectionPolicy->selectFacility(facilityOptions)),settlement.getName());
+         underConstruction.push_back(new_facility);
     }
     }
     // Update plan status

@@ -63,7 +63,7 @@ FacilityStatus Facility::step()
     {
         timeLeft--; // Reduce timeLeft
     }
-    else
+    if(timeLeft==0)
     {
         status = FacilityStatus::OPERATIONAL;
     }

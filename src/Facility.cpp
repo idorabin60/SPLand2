@@ -74,6 +74,11 @@ const FacilityStatus &Facility::getStatus() const
 {
     return status;
 }
+Facility *Facility::clone() const
+{
+    return new Facility(*this);
+}
+
 std::string FacilityStatusToString(FacilityStatus status)
 {
     switch (status)

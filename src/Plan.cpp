@@ -80,3 +80,23 @@ const std::string Plan::toString() const
     oss << "Under Construction: " << underConstruction.size() << " facilities\n";
     return oss.str();
 }
+Plan::Plan(const Plan &other)
+    : plan_id(other.plan_id),
+      settlement(other.settlement),
+      selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr), // Deep copy selectionPolicy
+      status(other.status),
+      facilityOptions(other.facilityOptions),
+      life_quality_score(other.life_quality_score),
+      economy_score(other.economy_score),
+      environment_score(other.environment_score)
+{
+    // Deep copy the facilities vector
+    for (int i = 0; i < other.facilities.size(); i++)
+    {
+        facilities.push_back(other.facilities.at(i)->clone());
+    }
+    for (int i = 0; i < other.underConstruction.size(); i++)
+    {
+        underConstruction.push_back(other.underConstruction.at(i)->clone());
+    }
+}

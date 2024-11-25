@@ -23,7 +23,8 @@ public:
     void printStatus();                              // done
     const vector<Facility *> &getFacilities() const; // done
     void addFacility(Facility *facility);            // done
-    const string toString() const;                   // done
+    const string toString() const;
+    Plan(const Plan &other);
 
 private:
     int plan_id;

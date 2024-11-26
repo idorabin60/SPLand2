@@ -14,10 +14,10 @@ enum class PlanStatus
 class Plan
 {
 public:
-    Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions); // done
-    const int getlifeQualityScore() const;                                                                                               // done                                                                                            // done
-    const int getEconomyScore() const;                                                                                                   // done                                                                                                  // done
-    const int getEnvironmentScore() const;                                                                                               // done                                                                                             // done
+    Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
+    const int getlifeQualityScore() const; // done
+    const int getEconomyScore() const;     // done
+    const int getEnvironmentScore() const; // done
     void setSelectionPolicy(SelectionPolicy *selectionPolicy);
     void step();
     void printStatus();

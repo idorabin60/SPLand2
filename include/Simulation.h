@@ -27,6 +27,9 @@ public:
     void open();
     void parseConfigFile(const std::string &configFilePath);
     void printInitialState() const;
+    ~Simulation();
+    // ido functions:
+    SelectionPolicy *createSelectionPolicy(const std::string &policyType);
 
 private:
     bool isRunning;

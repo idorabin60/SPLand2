@@ -115,6 +115,8 @@ const std::string Plan::toString() const
     oss << "Environment Score: " << environment_score << "\n";
     oss << "Facilities: " << facilities.size() << " completed\n";
     oss << "Under Construction: " << underConstruction.size() << " facilities\n";
+    oss << "Settlement name: " << settlement.getName() << " facilities\n";
+
     return oss.str();
 }
 Plan::Plan(const Plan &other)

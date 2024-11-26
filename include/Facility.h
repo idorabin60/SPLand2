@@ -51,6 +51,7 @@ public:
     const FacilityStatus &getStatus() const;
     const string toString() const;
     Facility *clone() const override;
+    static std::string facilityCategoryToString(FacilityCategory category); // Make it static
 
 private:
     const string settlementName;

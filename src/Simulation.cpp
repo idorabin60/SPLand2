@@ -190,10 +190,11 @@ void Simulation::printInitialState() const
         for (const auto &facility : facilitiesOptions)
         {
             std::cout << "  Name: " << facility.getName()
+                      << "  Category: " << Facility::facilityCategoryToString(facility.getCategory()) << "\n"
+                      << ", Price: " << facility.getCost()
                       << ", Life Quaily Score:: " << facility.getLifeQualityScore()
-                      << ", Environment Score: " << facility.getEnvironmentScore()
                       << ", Econemy Score: " << facility.getEconomyScore()
-                      << ", Cost: " << facility.getCost();
+                      << ", Environment Score: " << facility.getEnvironmentScore();
         }
     }
 }

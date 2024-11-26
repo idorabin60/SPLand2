@@ -38,4 +38,10 @@ private:
     vector<Plan> plans;
     vector<Settlement *> settlements;
     vector<FacilityType> facilitiesOptions;
+
+    // Helper methods for parsing configuration
+    void parseConfig(const std::string &configFilePath);
+    void handleSettlementCommand(const std::vector<std::string> &arguments);
+    void handleFacilityCommand(const std::vector<std::string> &arguments);
+    void handlePlanCommand(const std::vector<std::string> &arguments);
 };

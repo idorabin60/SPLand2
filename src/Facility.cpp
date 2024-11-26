@@ -63,7 +63,7 @@ FacilityStatus Facility::step()
     {
         timeLeft--; // Reduce timeLeft
     }
-    if(timeLeft==0)
+    if (timeLeft == 0)
     {
         status = FacilityStatus::OPERATIONAL;
     }
@@ -106,4 +106,22 @@ const string Facility::toString() const
         << ", Status: " << FacilityStatusToString(getStatus())
         << ", Time Left: " << getTimeLeft();
     return oss.str();
+}
+#include <string>
+#include <iostream>
+
+// Define the enum-to-string conversion function
+std::string Facility::facilityCategoryToString(FacilityCategory category)
+{
+    switch (category)
+    {
+    case FacilityCategory::LIFE_QUALITY:
+        return "Life Quality";
+    case FacilityCategory::ECONOMY:
+        return "Economy";
+    case FacilityCategory::ENVIRONMENT:
+        return "Environment";
+    default:
+        return "Unknown Category";
+    }
 }

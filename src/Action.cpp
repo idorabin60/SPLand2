@@ -51,7 +51,7 @@ AddPlan::AddPlan(const string &settlementName, const string &selectionPolicy)
 
     void AddPlan::act(Simulation &simulation) {
         Settlement settlement_to_addPlan = simulation.getSettlement(settlementName);
-         BalancedSelection wanted_policy;
+        SelectionPolicy wanted_policy;
         if (selectionPolicy=="bal")
            wanted_policy = BalancedSelection(0,0,0);
         if(selectionPolicy=="eco")
@@ -87,8 +87,10 @@ AddSettlement::AddSettlement(const string &settlementName, SettlementType settle
 void AddSettlement::act(Simulation &simulation) {
     if(simulation.isSettlementExists(settlementName)){
         Settlement new_settlent = Settlement(settlementName, settlementType);
-        simulation.addSettlement(new_settlent);
-        complete();
+        if (simulation.addSettlement(new_settlent));
+            complete();
+        else
+           error();
     }
     else{
         error();
@@ -106,4 +108,70 @@ const string AddSettlement::toString() const {
 
 //--------------------------//////
 // AddFacility Implementation
+AddFacility::AddFacility(const string &facilityName,
+                         const FacilityCategory facilityCategory,
+                         const int price,
+                         const int lifeQualityScore,
+                         const int economyScore,
+                         const int environmentScore)
+    : BaseAction(),  // Calling the BaseAction constructor
+      facilityName(facilityName),
+      facilityCategory(facilityCategory),
+      price(price),
+      lifeQualityScore(lifeQualityScore),
+      economyScore(economyScore),
+      environmentScore(environmentScore) {}
 
+void AddFacility::act(Simulation &simulation) {
+    FacilityType new_facility = FacilityType();
+    if (simulation.addFacility(new_facility))
+        complete(); 
+    else
+       error();
+}
+AddFacility* AddFacility::clone() const {
+    return new AddFacility(*this);  
+}
+const string AddFacility::toString() const {
+    std::stringstream ss;
+    ss << "AddFacility: " << facilityName << ", Category: " << static_cast<int>(facilityCategory) << to_string(getStatus());
+    return ss.str();
+}
+
+//--------------------------//////
+// PrintPlanStatus Implementation
+PrintPlanStatus::PrintPlanStatus(int planId)
+    : BaseAction(), planId(planId) {}
+
+void PrintPlanStatus::act(Simulation &simulation) {
+    Plan this_plan = simulation.getPlan(planId);
+    this_plan.toString(); 
+    complete();
+}
+PrintPlanStatus* PrintPlanStatus::clone() const {
+    return new PrintPlanStatus(*this);  
+}
+const string PrintPlanStatus::toString() const {
+    std::stringstream ss;
+    ss << "Plan " << planId <<to_string(getStatus());
+    return ss.str();
+}
+
+//--------------------------//////
+// ChangePlanPolicy Implementation
+ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy)
+    : BaseAction(), planId(planId), newPolicy(newPolicy) {}
+
+void ChangePlanPolicy::act(Simulation &simulation) {
+    Plan to_change = simulation.getPlan(planId);
+     SelectionPolicy wanted_policy;
+        if (selectionPolicy=="bal")
+           wanted_policy = BalancedSelection(0,0,0);
+        if(selectionPolicy=="eco")
+           wanted_policy = EconomySelection();
+        if (selectionPolicy=="sus")
+            wanted_policy = SustainabilitySelection();
+        else
+           wanted_policy = NaiveSelection();
+    to_change.setSelectionPolicy
+}

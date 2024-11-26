@@ -139,6 +139,20 @@ Plan::Plan(const Plan &other)
         underConstruction.push_back(other.underConstruction.at(i)->clone());
     }
 }
+Plan::Plan(Plan &&other)
+    : plan_id(other.plan_id),
+      settlement(other.settlement),           // Reference is copied
+      selectionPolicy(other.selectionPolicy), // Pointer is moved
+      status(other.status),
+      facilities(std::move(other.facilities)),               // Vector is moved
+      underConstruction(std::move(other.underConstruction)), // Vector is moved
+      facilityOptions(other.facilityOptions),                // Reference is copied
+      life_quality_score(other.life_quality_score),
+      economy_score(other.economy_score),
+      environment_score(other.environment_score)
+{
+    other.selectionPolicy = nullptr; // Nullify source pointer to avoid double deletion
+}
 
 Plan::~Plan()
 {

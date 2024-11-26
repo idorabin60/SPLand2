@@ -26,6 +26,9 @@ public:
     const string toString() const;
     Plan(const Plan &other);
     ~Plan();
+    Plan(Plan &&other);
+    Plan &operator=(const Plan &other) = delete;
+    Plan &operator=(Plan &&other) = delete;
 
 private:
     int plan_id;

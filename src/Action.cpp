@@ -30,27 +30,51 @@ const string &BaseAction::getErrorMsg() const
 
 //--------------------------//////
 
-// // SimulateStep Implementation
-// SimulateStep::SimulateStep(const int numOfSteps) : BaseAction(), numOfSteps(numOfSteps) {}
+// SimulateStep Implementation
+SimulateStep::SimulateStep(const int numOfSteps) : BaseAction(), numOfSteps(numOfSteps) {}
 
-// void SimulateStep::act(Simulation &simulation)
-// {
-//     for (int i = 0; i < numOfSteps; i++)
-//     {
-//         simulation.step();
-//     }
+void SimulateStep::act(Simulation &simulation)
+{
+    for (int i = 0; i < numOfSteps; i++)
+    {
+        simulation.step();
+    }
+    complete();
+}
+
+const string SimulateStep::toString() const
+{
+    if (getStatus() ==ActionStatus::ERROR)
+         return ("STEP" + to_string(numOfSteps) + "ERROR");
+    else
+         return ("STEP" + to_string(numOfSteps) + "COMPLETED");
+}
+
+SimulateStep *SimulateStep::clone() const
+{
+    return new SimulateStep(*this);
+}
+
+//  //--------------------------//////
+// // PrintPlanStatus Implementation
+// PrintPlanStatus::PrintPlanStatus(int planId)
+//     : BaseAction(), planId(planId) {}
+
+// void PrintPlanStatus::act(Simulation &simulation) {
+//     Plan this_plan = simulation.getPlan(planId);
+//     this_plan.toString(); 
 //     complete();
 // }
-
-// const string SimulateStep::toString() const
-// {
-//    return ("STEP" + to_string(numOfSteps) + to_string(getStatus());
+// PrintPlanStatus* PrintPlanStatus::clone() const {
+//     return new PrintPlanStatus(*this);  
+// }
+// const string PrintPlanStatus::toString() const {
+//     std::stringstream ss;
+//     ss << "Plan " << planId <<to_string(getStatus());
+//     return ss.str();
 // }
 
-// SimulateStep *SimulateStep::clone() const
-// {
-//     return new SimulateStep(*this);
-// }
+
 
 // //--------------------------//////
 // // AddPlan Implementation
@@ -155,24 +179,6 @@ const string &BaseAction::getErrorMsg() const
 //     return ss.str();
 // }
 
-// //--------------------------//////
-// // PrintPlanStatus Implementation
-// PrintPlanStatus::PrintPlanStatus(int planId)
-//     : BaseAction(), planId(planId) {}
-
-// void PrintPlanStatus::act(Simulation &simulation) {
-//     Plan this_plan = simulation.getPlan(planId);
-//     this_plan.toString(); 
-//     complete();
-// }
-// PrintPlanStatus* PrintPlanStatus::clone() const {
-//     return new PrintPlanStatus(*this);  
-// }
-// const string PrintPlanStatus::toString() const {
-//     std::stringstream ss;
-//     ss << "Plan " << planId <<to_string(getStatus());
-//     return ss.str();
-// }
 
 // //--------------------------//////
 // // ChangePlanPolicy Implementation
@@ -192,3 +198,4 @@ const string &BaseAction::getErrorMsg() const
 //            wanted_policy = NaiveSelection();
 //     to_change.setSelectionPolicy
 // }
+

@@ -9,6 +9,9 @@
 #include "Settlement.h"
 #include "Facility.h"
 #include "SelectionPolicy.h"
+#include "Action.h"
+#include <sstream>
+using namespace std;
 
 // Constructor
 Simulation::Simulation(const std::string &configFilePath)
@@ -156,6 +159,24 @@ void Simulation::start()
 {
     isRunning = true;
     std::cout << "Sim is running!";
+    // std::string userInput;
+    // std::getline(std::cin, userInput); 
+    // int numOfSteps = userInput[userInput.size() - 1]- '0';
+    // std::string str =(userInput.substr(0, userInput.size() - 1));
+    // if (str =="step"){
+        SimulateStep user_step=SimulateStep(1);
+        user_step.act(*this);
+        std::cout << user_step.toString() << std::endl;;
+        // for (Plan element : plans){
+        //      std::cout << element.toString() << std::endl;;
+        // }
+}
+
+void Simulation::step()
+{
+    for(Plan element: plans){
+        element.step();
+    }
 }
 
 // Stop function

@@ -6,7 +6,6 @@ using namespace std;
 
 // Constructor and generic methods
 BaseAction::BaseAction() : status(ActionStatus::ERROR), errorMsg("") {}
-
 void BaseAction::complete()
 {
     status = ActionStatus::COMPLETED;
@@ -87,7 +86,7 @@ AddPlan::AddPlan(const string &settlementName, const string &selectionPolicy)
 
 void AddPlan::act(Simulation &simulation)
 {
-    Settlement settlement_to_addPlan = simulation.getSettlement(settlementName);
+    Settlement& settlement_to_addPlan = simulation.getSettlement(settlementName);
     SelectionPolicy *wanted_policy = nullptr;
     if (selectionPolicy == "bal")
         wanted_policy = new BalancedSelection(0, 0, 0);
@@ -116,41 +115,39 @@ AddPlan *AddPlan::clone() const
     return new AddPlan(*this);
 }
 
-// //--------------------------//////
-// // AddSettlement Implementation
+//--------------------------//////
+// AddSettlement Implementation
 
-// AddSettlement::AddSettlement(const string &settlementName, SettlementType settlementType)
-//     : BaseAction(), settlementName(settlementName), settlementType(settlementType)
-// {
-//     erroeMsg = "Settlement already exsite";
-// }
+AddSettlement::AddSettlement(const string &settlementName, SettlementType settlementType)
+    : BaseAction(), settlementName(settlementName), settlementType(settlementType)
+{}
 
-// void AddSettlement::act(Simulation &simulation)
-// {
-//     if (simulation.isSettlementExists(settlementName))
-//     {
-//         Settlement new_settlent = Settlement(settlementName, settlementType);
-//         if (simulation.addSettlement(new_settlent));
-//             complete();
-//         else
-//            error();
-//     }
-//     else
-//     {
-//         error();
-//     }
-// }
-// AddSettlement *AddSettlement::clone() const
-// {
-//     return new AddSettlement(*this);
-// }
-// const string AddSettlement::toString() const
-// {
-//     stringstream ss;
-//     ss << "AddSettlement - Name: " << settlementName
-//        << ", Type: " << static_cast<int>(settlementType) << to_string(getStatus();
-//     return ss.str();
-// }
+void AddSettlement::act(Simulation &simulation)
+{
+    if (!simulation.isSettlementExists(settlementName))
+    {
+        Settlement* new_settlent = new Settlement(settlementName, settlementType);
+        if (simulation.addSettlement(new_settlent))
+            complete();
+        else
+           error("Settlement already exsite");
+    }
+    else
+    {
+        error("Settlement already exsite");
+    }
+}
+AddSettlement *AddSettlement::clone() const
+{
+    return new AddSettlement(*this);
+}
+const string AddSettlement::toString() const
+{
+    if (getStatus() == ActionStatus::ERROR)
+        return ("Action: AddSettlement ERROR!");
+    else
+        return ("Action: AddSettlement COMPLETED!");
+}
 
 // //--------------------------//////
 // // AddFacility Implementation

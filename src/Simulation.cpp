@@ -176,16 +176,12 @@ void Simulation::start()
     // if (str =="step"){
     SimulateStep user_step = SimulateStep(1);
     user_step.act(*this);
-    // std::cout << user_step.toString() << std::endl;;
-    std::cout << planCounter << std::endl;
-    ;
-    AddPlan temp = AddPlan("BeitSPL", "eco");
-    temp.act(*this);
-    std::cout << temp.toString() << std::endl;
-    ;
-    PrintPlanStatus printTemp = PrintPlanStatus(2);
-    printTemp.act(*this);
-    std::cout << printTemp.toString() << std::endl;
+    AddSettlement tt = AddSettlement("DafnaTheking",SettlementType::CITY);
+    tt.act(*this);
+    std::cout << tt.toString() << std::endl;
+    std::cout << settlements.back()->toString() << std::endl;
+
+
     ;
 }
 
@@ -274,7 +270,6 @@ Settlement &Simulation::getSettlement(const string &settlementName)
     {
         if (set->getName() == settlementName)
         {
-            std::cout << set->toString();
             return *set;
         }
     }
@@ -283,7 +278,24 @@ Settlement &Simulation::getSettlement(const string &settlementName)
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy)
 {
     Settlement s = settlement;
-    Plan new_plan = Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
-    plans.push_back(std::move(new_plan));
+    Plan *new_plan =  new Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
+    plans.push_back((*new_plan));
     planCounter++;
+}
+////
+bool Simulation::addSettlement(Settlement *settlement){
+    //asumme that that settlement dosent exsit
+    settlements.push_back(settlement);
+    return true; 
+}
+
+bool Simulation::isSettlementExists(const string &settlementName){
+    for (Settlement *set : settlements)
+    {
+        if (set->getName() == settlementName)
+        {
+           return true; 
+        }
+    }
+    return false;
 }

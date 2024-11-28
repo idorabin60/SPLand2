@@ -84,7 +84,7 @@ void Plan::step()
     }
     else
     { // The status is available
-        int facility_capacity = static_cast<int>(settlement.getType()) +1 - underConstruction.size();
+        int facility_capacity = static_cast<int>(settlement.getType()) + 1 - underConstruction.size();
         for (int i = 0; i < facility_capacity; i++)
         {
             Facility *new_facility = new Facility(
@@ -95,7 +95,7 @@ void Plan::step()
     }
 
     // Update plan status
-    if ((int)underConstruction.size() != static_cast<int>(settlement.getType()) +1)
+    if ((int)underConstruction.size() != static_cast<int>(settlement.getType()) + 1)
     {
         status = PlanStatus::AVALIABLE;
     }
@@ -103,7 +103,8 @@ void Plan::step()
     {
         status = PlanStatus::BUSY;
     }
-     std::cout <<  this->toString() << std::endl;;
+    std::cout << this->toString() << std::endl;
+    ;
 }
 
 // Convert Plan object to a string representation
@@ -111,16 +112,17 @@ const std::string Plan::toString() const
 {
     std::ostringstream oss;
     oss << "PlanID: " << plan_id << "\n";
-    oss << "SettlementName" << settlement.getName()<<"\n";
-     oss << "SelectionPolicy" << selectionPolicy->toString()<<"\n";
+    oss << "SettlementName" << settlement.getName() << "\n";
+    oss << "SelectionPolicy" << selectionPolicy->toString() << "\n";
     oss << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "Available" : "Busy") << "\n";
     oss << "Life Quality Score: " << life_quality_score << "\n";
     oss << "Economy Score: " << economy_score << "\n";
     oss << "Environment Score: " << environment_score << "\n";
     oss << "Facilities: " << facilities.size() << " completed\n";
     oss << "Under Construction: " << underConstruction.size() << " facilities:\n";
-    for (Facility* fac: underConstruction ){
-        oss << fac->getName() <<"\n";
+    for (Facility *fac : underConstruction)
+    {
+        oss << fac->getName() << "\n";
     }
     return oss.str();
 }

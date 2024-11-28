@@ -18,6 +18,7 @@ Simulation::Simulation(const std::string &configFilePath)
     : isRunning(false), planCounter(0) // Initialize fields
 {
     parseConfig(configFilePath);
+    printInitialState();
 }
 
 // Destructor
@@ -134,14 +135,22 @@ void Simulation::handlePlanCommand(const std::vector<std::string> &arguments)
 {
     if (arguments.size() == 3)
     {
-        auto settlementIt = std::find_if(settlements.begin(), settlements.end(),
-                                         [&arguments](Settlement *settlement)
-                                         { return settlement->getName() == arguments[1]; });
+        Settlement *foundSettlement = nullptr;
 
-        if (settlementIt != settlements.end())
+        // Standard for loop to iterate through settlements
+        for (size_t i = 0; i < settlements.size(); ++i)
+        {
+            if (settlements[i]->getName() == arguments[1])
+            {
+                foundSettlement = settlements[i];
+                break; // Exit loop as we found the matching settlement
+            }
+        }
+
+        if (foundSettlement)
         {
             SelectionPolicy *policy = createSelectionPolicy(arguments[2]);
-            plans.emplace_back(planCounter++, **settlementIt, policy, facilitiesOptions);
+            plans.emplace_back(planCounter++, *foundSettlement, policy, facilitiesOptions);
         }
         else
         {
@@ -158,23 +167,30 @@ void Simulation::handlePlanCommand(const std::vector<std::string> &arguments)
 void Simulation::start()
 {
     isRunning = true;
-    std::cout << "Sim is running!";
-    // std::string userInput;
-    // std::getline(std::cin, userInput); 
-    // int numOfSteps = userInput[userInput.size() - 1]- '0';
-    // std::string str =(userInput.substr(0, userInput.size() - 1));
-    // if (str =="step"){
-        SimulateStep user_step=SimulateStep(1);
-        user_step.act(*this);
-        std::cout << user_step.toString() << std::endl;;
-        // for (Plan element : plans){
-        //      std::cout << element.toString() << std::endl;;
-        // }
+    std::cout << "Sim is running!" << std::endl;
+
+    SimulateStep user_step = SimulateStep(1);
+    user_step.act(*this);
+    std::cout << user_step.toString() << std::endl;
+
+    std::string action; // Declare the variable here
+    std::cout << "Enter action please: ";
+    std::cin >> action;
+
+    while (action != "close")
+    {
+        actionHandler(action);
+        std::cout << "Enter action please: ";
+        std::cin >> action;
+    }
+
+    std::cout << "Finished" << std::endl;
 }
 
 void Simulation::step()
 {
-    for(Plan element: plans){
+    for (Plan element : plans)
+    {
         element.step();
     }
 }
@@ -238,5 +254,54 @@ void Simulation::printInitialState() const
                       << ", Economy Score: " << facility.getEconomyScore()
                       << ", Environment Score: " << facility.getEnvironmentScore() << std::endl;
         }
+    }
+}
+
+// parsing string method:
+std::vector<std::string> parseToWords(const std::string &input)
+{
+    std::vector<std::string> words;
+    std::istringstream stream(input);
+    std::string word;
+
+    // Extract each word and add to the vector
+    while (stream >> word)
+    {
+        words.push_back(word);
+    }
+
+    return words;
+}
+// Create an action handler
+void Simulation::actionHandler(const std::string &action)
+{
+    std::vector<std::string> words = parseToWords(action);
+    if (words[0] == "settlement")
+    {
+        std::cout << "Call add settlement operation" << std::endl;
+    }
+    else if (words[0] == "restore")
+    {
+        std::cout << "Call restore operation" << std::endl;
+    }
+    else if (words[0] == "facility")
+    {
+        std::cout << "Call add facility operation" << std::endl;
+    }
+    else if (words[0] == "plan")
+    {
+        std::cout << "Call add plan operation" << std::endl;
+    }
+    else if (words[0] == "backup")
+    {
+        std::cout << "Call backup operation" << std::endl;
+    }
+    else if (words[0] == "log")
+    {
+        std::cout << "Call log operation" << std::endl;
+    }
+    else
+    {
+        std::cout << "Unknown action: " << words[0] << std::endl;
     }
 }

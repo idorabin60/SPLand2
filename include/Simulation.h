@@ -30,6 +30,7 @@ public:
     ~Simulation();
     // ido functions:
     SelectionPolicy *createSelectionPolicy(const std::string &policyType);
+    void actionHandler(const std::string &action);
 
 private:
     bool isRunning;

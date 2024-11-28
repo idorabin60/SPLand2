@@ -19,7 +19,6 @@ Simulation::Simulation(const std::string &configFilePath)
     : isRunning(false), planCounter(0) // Initialize fields
 {
     parseConfig(configFilePath);
-    printInitialState();
 }
 
 // Destructor
@@ -169,16 +168,24 @@ void Simulation::start()
 {
     isRunning = true;
     std::string action = "";
-    std::cout << "Sim is running!";
-    std::cout << "Type an action please";
-    std::cin >> action;
-    while (action != "close")
+
+    std::cout << "Simulation is running!" << std::endl;
+
+    while (true)
     {
-        actionHandler(action);
-        std::cout << "Type an action please";
-        std::cin >> action;
+        std::cout << "Type an action (or 'close' to stop): ";
+        std::getline(std::cin, action); // Use getline to capture the entire input line
+
+        if (action == "close")
+        {
+            std::cout << "Simulation finished." << std::endl;
+            break; // Exit the loop if user types "close"
+        }
+
+        actionHandler(action); // Handle the full line of input
     }
-    std::cout << "sim finished";
+
+    isRunning = false; // Mark simulation as stopped
 }
 
 void Simulation::step()
@@ -200,7 +207,7 @@ SelectionPolicy *Simulation::createSelectionPolicy(const std::string &policyType
 {
     if (policyType == "bal")
     {
-        return new BalancedSelection(50, 50, 50); // Example default scores
+        return new BalancedSelection(0, 0, 0); // Example default scores
     }
     else if (policyType == "eco")
     {
@@ -326,7 +333,21 @@ void Simulation::actionHandler(const std::string &action)
     std::vector<std::string> words = parseToWords(action);
     if (words[0] == "settlement")
     {
-        std::cout << "Call add settlement operation" << std::endl;
+        if (words[2] == "0")
+        {
+            AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::VILLAGE);
+            settlemntToBeAdded.act(*this);
+        }
+        else if (words[2] == "1")
+        {
+            AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::CITY);
+            settlemntToBeAdded.act(*this);
+        }
+        else if (words[2] == "2")
+        {
+            AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::METROPOLIS);
+            settlemntToBeAdded.act(*this);
+        }
     }
     else if (words[0] == "restore")
     {
@@ -334,12 +355,35 @@ void Simulation::actionHandler(const std::string &action)
     }
     else if (words[0] == "facility")
     {
-        std::cout << "Call add facility operation" << std::endl;
+        if (words[2] == "0")
+        {
+            AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::LIFE_QUALITY, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
+            faccilityToBeAdded.act(*this);
+        }
+        if (words[2] == "1")
+        {
+            AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ECONOMY, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
+            faccilityToBeAdded.act(*this);
+        }
+        if (words[2] == "3")
+        {
+            AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ENVIRONMENT, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
+            faccilityToBeAdded.act(*this);
+        }
     }
     else if (words[0] == "plan")
     {
-        std::cout << "Call add plan operation" << std::endl;
+        if (isSettlementExists(words[1]))
+        {
+            AddPlan planToBeAdded(words[1], words[2]);
+            planToBeAdded.act(*this);
+        }
+        else
+        {
+            std::cout << "ahi ze ihsov lo kaiam ma ata dba" << std::endl;
+        }
     }
+
     else if (words[0] == "backup")
     {
         std::cout << "Call backup operation" << std::endl;
@@ -347,6 +391,11 @@ void Simulation::actionHandler(const std::string &action)
     else if (words[0] == "log")
     {
         std::cout << "Call log operation" << std::endl;
+    }
+    else if (words[0] == "planStatus")
+    {
+        PrintPlanStatus planStatusToBeAdded = PrintPlanStatus(std::stoi(words[1]));
+        planStatusToBeAdded.act(*this);
     }
     else
     {

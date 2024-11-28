@@ -149,37 +149,38 @@ const string AddSettlement::toString() const
         return ("Action: AddSettlement COMPLETED!");
 }
 
-// //--------------------------//////
-// // AddFacility Implementation
-// AddFacility::AddFacility(const string &facilityName,
-//                          const FacilityCategory facilityCategory,
-//                          const int price,
-//                          const int lifeQualityScore,
-//                          const int economyScore,
-//                          const int environmentScore)
-//     : BaseAction(),  // Calling the BaseAction constructor
-//       facilityName(facilityName),
-//       facilityCategory(facilityCategory),
-//       price(price),
-//       lifeQualityScore(lifeQualityScore),
-//       economyScore(economyScore),
-//       environmentScore(environmentScore) {}
+//--------------------------//////
+// AddFacility Implementation
+AddFacility::AddFacility(const string &facilityName,
+                         const FacilityCategory facilityCategory,
+                         const int price,
+                         const int lifeQualityScore,
+                         const int economyScore,
+                         const int environmentScore)
+    : BaseAction(),  // Calling the BaseAction constructor
+      facilityName(facilityName),
+      facilityCategory(facilityCategory),
+      price(price),
+      lifeQualityScore(lifeQualityScore),
+      economyScore(economyScore),
+      environmentScore(environmentScore) {}
 
-// void AddFacility::act(Simulation &simulation) {
-//     FacilityType new_facility = FacilityType();
-//     if (simulation.addFacility(new_facility))
-//         complete();
-//     else
-//        error();
-// }
-// AddFacility* AddFacility::clone() const {
-//     return new AddFacility(*this);
-// }
-// const string AddFacility::toString() const {
-//     std::stringstream ss;
-//     ss << "AddFacility: " << facilityName << ", Category: " << static_cast<int>(facilityCategory) << to_string(getStatus());
-//     return ss.str();
-// }
+void AddFacility::act(Simulation &simulation) {
+    FacilityType new_facility = FacilityType(facilityName,facilityCategory,price,lifeQualityScore,economyScore,environmentScore);
+    if (simulation.addFacility(new_facility))
+        complete();
+    else
+       std::cout << "Error!!" << std::endl;
+}
+AddFacility* AddFacility::clone() const {
+    return new AddFacility(*this);
+}
+const string AddFacility::toString() const {
+   if (getStatus() == ActionStatus::ERROR)
+        return ("Action: AddFacility ERROR!");
+    else
+        return ("Action: AddFacility COMPLETED!");
+}
 
 // //--------------------------//////
 // // ChangePlanPolicy Implementation

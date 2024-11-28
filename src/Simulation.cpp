@@ -179,10 +179,10 @@ void Simulation::start()
     AddSettlement tt = AddSettlement("DafnaTheking",SettlementType::CITY);
     tt.act(*this);
     std::cout << tt.toString() << std::endl;
-    std::cout << settlements.back()->toString() << std::endl;
-
-
-    ;
+    std::cout << settlements.back()->toString() << std::endl;;
+    AddFacility add_facility = AddFacility("GymForDaf",FacilityCategory::LIFE_QUALITY,2,5,5,5);
+    add_facility.act(*this);
+     std::cout << facilitiesOptions.back().getName() << std::endl;;
 }
 
 void Simulation::step()
@@ -219,11 +219,6 @@ SelectionPolicy *Simulation::createSelectionPolicy(const std::string &policyType
 // Function to print the initial state of the Simulation
 void Simulation::printInitialState() const
 {
-    std::cout << "Simulation Initial State:" << std::endl;
-    std::cout << "isRunning: " << (isRunning ? "true" : "false") << std::endl;
-    std::cout << "planCounter: " << planCounter << std::endl;
-
-    std::cout << "Settlements:" << std::endl;
     if (settlements.empty())
     {
         std::cout << "  None" << std::endl;
@@ -298,4 +293,13 @@ bool Simulation::isSettlementExists(const string &settlementName){
         }
     }
     return false;
+}
+bool Simulation::addFacility(FacilityType facility){
+    for (FacilityType fac : facilitiesOptions){
+        if (fac.getName() == facility.getName()){
+            return false;
+        }
+    }
+    facilitiesOptions.push_back(facility);
+    return true; 
 }

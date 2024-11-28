@@ -45,10 +45,10 @@ void SimulateStep::act(Simulation &simulation)
 
 const string SimulateStep::toString() const
 {
-    if (getStatus() ==ActionStatus::ERROR)
-         return ("STEP" + to_string(numOfSteps) + "ERROR");
+    if (getStatus() == ActionStatus::ERROR)
+        return ("STEP" + to_string(numOfSteps) + "ERROR");
     else
-         return ("STEP" + to_string(numOfSteps) + "COMPLETED");
+        return ("STEP" + to_string(numOfSteps) + "COMPLETED");
 }
 
 SimulateStep *SimulateStep::clone() const
@@ -56,25 +56,28 @@ SimulateStep *SimulateStep::clone() const
     return new SimulateStep(*this);
 }
 
- //--------------------------//////
+//--------------------------//////
 // PrintPlanStatus Implementation
 PrintPlanStatus::PrintPlanStatus(int planId)
     : BaseAction(), planId(planId) {}
 
-void PrintPlanStatus::act(Simulation &simulation) {
+void PrintPlanStatus::act(Simulation &simulation)
+{
     Plan this_plan = simulation.getPlan(planId);
-    std::cout << this_plan.toString() << std::endl;;
+    std::cout << this_plan.toString() << std::endl;
+    ;
     complete();
 }
-PrintPlanStatus* PrintPlanStatus::clone() const {
-    return new PrintPlanStatus(*this);  
+PrintPlanStatus *PrintPlanStatus::clone() const
+{
+    return new PrintPlanStatus(*this);
 }
-const string PrintPlanStatus::toString() const {
-    if (getStatus() ==ActionStatus::ERROR)
-         return ("Action: PrintPlanStatus of Plan" + to_string(planId) + " ERROR");
+const string PrintPlanStatus::toString() const
+{
+    if (getStatus() == ActionStatus::ERROR)
+        return ("Action: PrintPlanStatus of Plan" + to_string(planId) + " ERROR");
     else
-         return ("Action: PrintPlanStatus of Plan" + to_string(planId) + + " COMPLETED");
-
+        return ("Action: PrintPlanStatus of Plan" + to_string(planId) + +" COMPLETED");
 }
 
 //--------------------------//////
@@ -85,7 +88,7 @@ AddPlan::AddPlan(const string &settlementName, const string &selectionPolicy)
 void AddPlan::act(Simulation &simulation)
 {
     Settlement settlement_to_addPlan = simulation.getSettlement(settlementName);
-     SelectionPolicy* wanted_policy = nullptr;
+    SelectionPolicy *wanted_policy = nullptr;
     if (selectionPolicy == "bal")
         wanted_policy = new BalancedSelection(0, 0, 0);
     else if (selectionPolicy == "eco")
@@ -102,10 +105,10 @@ void AddPlan::act(Simulation &simulation)
 const string AddPlan::toString() const
 {
 
-     if (getStatus() ==ActionStatus::ERROR)
-         return ("Action: AddPlan ERROR");
+    if (getStatus() == ActionStatus::ERROR)
+        return ("Action: AddPlan ERROR");
     else
-         return ("Action: AddPlan COMPLETED");
+        return ("Action: AddPlan COMPLETED");
 }
 
 AddPlan *AddPlan::clone() const
@@ -168,19 +171,18 @@ AddPlan *AddPlan::clone() const
 // void AddFacility::act(Simulation &simulation) {
 //     FacilityType new_facility = FacilityType();
 //     if (simulation.addFacility(new_facility))
-//         complete(); 
+//         complete();
 //     else
 //        error();
 // }
 // AddFacility* AddFacility::clone() const {
-//     return new AddFacility(*this);  
+//     return new AddFacility(*this);
 // }
 // const string AddFacility::toString() const {
 //     std::stringstream ss;
 //     ss << "AddFacility: " << facilityName << ", Category: " << static_cast<int>(facilityCategory) << to_string(getStatus());
 //     return ss.str();
 // }
-
 
 // //--------------------------//////
 // // ChangePlanPolicy Implementation
@@ -200,4 +202,3 @@ AddPlan *AddPlan::clone() const
 //            wanted_policy = NaiveSelection();
 //     to_change.setSelectionPolicy
 // }
-

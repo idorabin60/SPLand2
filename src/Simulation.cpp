@@ -10,6 +10,7 @@
 #include "Facility.h"
 #include "SelectionPolicy.h"
 #include "Action.h"
+#include "Plan.h"
 #include <sstream>
 using namespace std;
 
@@ -77,7 +78,7 @@ void Simulation::parseConfig(const std::string &configFilePath)
             std::cerr << "Unknown command: " << command << std::endl;
         }
     }
-
+    planCounter=plans.size();
     configFile.close();
 }
 
@@ -166,15 +167,22 @@ void Simulation::start()
     // if (str =="step"){
         SimulateStep user_step=SimulateStep(1);
         user_step.act(*this);
-        std::cout << user_step.toString() << std::endl;;
-        // for (Plan element : plans){
-        //      std::cout << element.toString() << std::endl;;
-        // }
+        // std::cout << user_step.toString() << std::endl;;
+         std::cout << planCounter << std::endl;;
+         AddPlan temp=AddPlan("BeitSPL", "eco" );
+         temp.act(*this);
+         std::cout << temp.toString() << std::endl;;
+         PrintPlanStatus printTemp= PrintPlanStatus(2);
+         printTemp.act(*this);
+         std::cout << printTemp.toString() << std::endl;;
+
+       
+        
 }
 
 void Simulation::step()
 {
-    for(Plan element: plans){
+    for(Plan &element: plans){
         element.step();
     }
 }
@@ -240,3 +248,29 @@ void Simulation::printInitialState() const
         }
     }
 }
+Plan &Simulation::getPlan(const int planID) {
+    // Check if the planID is within valid bounds
+    if (planID < 0 || planID >= plans.size()) {
+        std::cout << "Invalid plan ID" << std::endl;
+    }
+    // Return the plan by reference
+    return plans[planID];
+}
+Settlement &Simulation::getSettlement(const string &settlementName){
+    for (Settlement* set : settlements){
+        if (set->getName()==settlementName){
+            std::cout<<set->toString();
+            return *set;
+        }
+    }
+      throw std::runtime_error("Settlement not found: " + settlementName);    
+}
+void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy){
+    Settlement s = settlement;
+    Plan new_plan =Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
+    plans.push_back(std::move(new_plan));
+    planCounter++;
+}
+
+
+

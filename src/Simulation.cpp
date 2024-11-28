@@ -168,21 +168,17 @@ void Simulation::handlePlanCommand(const std::vector<std::string> &arguments)
 void Simulation::start()
 {
     isRunning = true;
+    std::string action = "";
     std::cout << "Sim is running!";
-    // std::string userInput;
-    // std::getline(std::cin, userInput);
-    // int numOfSteps = userInput[userInput.size() - 1]- '0';
-    // std::string str =(userInput.substr(0, userInput.size() - 1));
-    // if (str =="step"){
-    SimulateStep user_step = SimulateStep(1);
-    user_step.act(*this);
-    AddSettlement tt = AddSettlement("DafnaTheking",SettlementType::CITY);
-    tt.act(*this);
-    std::cout << tt.toString() << std::endl;
-    std::cout << settlements.back()->toString() << std::endl;;
-    AddFacility add_facility = AddFacility("GymForDaf",FacilityCategory::LIFE_QUALITY,2,5,5,5);
-    add_facility.act(*this);
-     std::cout << facilitiesOptions.back().getName() << std::endl;;
+    std::cout << "Type an action please";
+    std::cin >> action;
+    while (action != "close")
+    {
+        actionHandler(action);
+        std::cout << "Type an action please";
+        std::cin >> action;
+    }
+    std::cout << "sim finished";
 }
 
 void Simulation::step()
@@ -273,33 +269,87 @@ Settlement &Simulation::getSettlement(const string &settlementName)
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy)
 {
     Settlement s = settlement;
-    Plan *new_plan =  new Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
+    Plan *new_plan = new Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
     plans.push_back((*new_plan));
     planCounter++;
 }
 ////
-bool Simulation::addSettlement(Settlement *settlement){
-    //asumme that that settlement dosent exsit
+bool Simulation::addSettlement(Settlement *settlement)
+{
+    // asumme that that settlement dosent exsit
     settlements.push_back(settlement);
-    return true; 
+    return true;
 }
 
-bool Simulation::isSettlementExists(const string &settlementName){
+bool Simulation::isSettlementExists(const string &settlementName)
+{
     for (Settlement *set : settlements)
     {
         if (set->getName() == settlementName)
         {
-           return true; 
+            return true;
         }
     }
     return false;
 }
-bool Simulation::addFacility(FacilityType facility){
-    for (FacilityType fac : facilitiesOptions){
-        if (fac.getName() == facility.getName()){
+bool Simulation::addFacility(FacilityType facility)
+{
+    for (FacilityType fac : facilitiesOptions)
+    {
+        if (fac.getName() == facility.getName())
+        {
             return false;
         }
     }
     facilitiesOptions.push_back(facility);
-    return true; 
+    return true;
+}
+
+// parsing string method:
+std::vector<std::string> parseToWords(const std::string &input)
+{
+    std::vector<std::string> words;
+    std::istringstream stream(input);
+    std::string word;
+
+    // Extract each word and add to the vector
+    while (stream >> word)
+    {
+        words.push_back(word);
+    }
+
+    return words;
+}
+// Create an action handler
+void Simulation::actionHandler(const std::string &action)
+{
+    std::vector<std::string> words = parseToWords(action);
+    if (words[0] == "settlement")
+    {
+        std::cout << "Call add settlement operation" << std::endl;
+    }
+    else if (words[0] == "restore")
+    {
+        std::cout << "Call restore operation" << std::endl;
+    }
+    else if (words[0] == "facility")
+    {
+        std::cout << "Call add facility operation" << std::endl;
+    }
+    else if (words[0] == "plan")
+    {
+        std::cout << "Call add plan operation" << std::endl;
+    }
+    else if (words[0] == "backup")
+    {
+        std::cout << "Call backup operation" << std::endl;
+    }
+    else if (words[0] == "log")
+    {
+        std::cout << "Call log operation" << std::endl;
+    }
+    else
+    {
+        std::cout << "Unknown action: " << words[0] << std::endl;
+    }
 }

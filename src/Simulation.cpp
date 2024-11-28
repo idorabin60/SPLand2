@@ -10,6 +10,7 @@
 #include "Facility.h"
 #include "SelectionPolicy.h"
 #include "Action.h"
+#include "Plan.h"
 #include <sstream>
 using namespace std;
 
@@ -78,7 +79,7 @@ void Simulation::parseConfig(const std::string &configFilePath)
             std::cerr << "Unknown command: " << command << std::endl;
         }
     }
-
+    planCounter=plans.size();
     configFile.close();
 }
 
@@ -167,6 +168,27 @@ void Simulation::handlePlanCommand(const std::vector<std::string> &arguments)
 void Simulation::start()
 {
     isRunning = true;
+<<<<<<< HEAD
+    std::cout << "Sim is running!";
+    // std::string userInput;
+    // std::getline(std::cin, userInput); 
+    // int numOfSteps = userInput[userInput.size() - 1]- '0';
+    // std::string str =(userInput.substr(0, userInput.size() - 1));
+    // if (str =="step"){
+        SimulateStep user_step=SimulateStep(1);
+        user_step.act(*this);
+        // std::cout << user_step.toString() << std::endl;;
+         std::cout << planCounter << std::endl;;
+         AddPlan temp=AddPlan("BeitSPL", "eco" );
+         temp.act(*this);
+         std::cout << temp.toString() << std::endl;;
+         PrintPlanStatus printTemp= PrintPlanStatus(2);
+         printTemp.act(*this);
+         std::cout << printTemp.toString() << std::endl;;
+
+       
+        
+=======
     std::cout << "Sim is running!" << std::endl;
 
     SimulateStep user_step = SimulateStep(1);
@@ -185,12 +207,17 @@ void Simulation::start()
     }
 
     std::cout << "Finished" << std::endl;
+>>>>>>> b3dcdf7ba0aed330c6a3e85561411f6877291e3d
 }
 
 void Simulation::step()
 {
+<<<<<<< HEAD
+    for(Plan &element: plans){
+=======
     for (Plan element : plans)
     {
+>>>>>>> b3dcdf7ba0aed330c6a3e85561411f6877291e3d
         element.step();
     }
 }
@@ -256,6 +283,34 @@ void Simulation::printInitialState() const
         }
     }
 }
+<<<<<<< HEAD
+Plan &Simulation::getPlan(const int planID) {
+    // Check if the planID is within valid bounds
+    if (planID < 0 || planID >= plans.size()) {
+        std::cout << "Invalid plan ID" << std::endl;
+    }
+    // Return the plan by reference
+    return plans[planID];
+}
+Settlement &Simulation::getSettlement(const string &settlementName){
+    for (Settlement* set : settlements){
+        if (set->getName()==settlementName){
+            std::cout<<set->toString();
+            return *set;
+        }
+    }
+      throw std::runtime_error("Settlement not found: " + settlementName);    
+}
+void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy){
+    Settlement s = settlement;
+    Plan new_plan =Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
+    plans.push_back(std::move(new_plan));
+    planCounter++;
+}
+
+
+
+=======
 
 // parsing string method:
 std::vector<std::string> parseToWords(const std::string &input)
@@ -305,3 +360,4 @@ void Simulation::actionHandler(const std::string &action)
         std::cout << "Unknown action: " << words[0] << std::endl;
     }
 }
+>>>>>>> b3dcdf7ba0aed330c6a3e85561411f6877291e3d

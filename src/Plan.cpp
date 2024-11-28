@@ -103,8 +103,11 @@ void Plan::step()
     {
         status = PlanStatus::BUSY;
     }
+<<<<<<< HEAD
+=======
     std::cout << this->toString() << std::endl;
     ;
+>>>>>>> b3dcdf7ba0aed330c6a3e85561411f6877291e3d
 }
 
 // Convert Plan object to a string representation

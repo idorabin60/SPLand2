@@ -397,8 +397,17 @@ void Simulation::actionHandler(const std::string &action)
         PrintPlanStatus planStatusToBeAdded = PrintPlanStatus(std::stoi(words[1]));
         planStatusToBeAdded.act(*this);
     }
-    else
+    if (words[0] == "step")
     {
-        std::cout << "Unknown action: " << words[0] << std::endl;
+        SimulateStep simulateStepToBeAdded = SimulateStep(std::stoi(words[1]));
+        simulateStepToBeAdded.act(*this);
+    }
+    if (words[0] == "changePlanPoliciy")
+    {
+        std::cout << "were here";
+        ChangePlanPolicy changePlanPolicyToBeAdded = ChangePlanPolicy(std::stoi(words[1]), words[2]);
+        int x = (words[2] == "bal");
+        int y = 5;
+        changePlanPolicyToBeAdded.act(*this);
     }
 }

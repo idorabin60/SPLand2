@@ -331,22 +331,34 @@ std::vector<std::string> parseToWords(const std::string &input)
 void Simulation::actionHandler(const std::string &action)
 {
     std::vector<std::string> words = parseToWords(action);
+    if (words[0]=="log"){
+        PrintActionsLog printLog = PrintActionsLog(); 
+        printLog.act(*this);
+        BaseAction* clonedRestore = printLog.clone(); 
+        actionsLog.push_back(clonedRestore);
+    }
     if (words[0] == "settlement")
     {
         if (words[2] == "0")
         {
             AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::VILLAGE);
             settlemntToBeAdded.act(*this);
+            BaseAction* clonedRestore = settlemntToBeAdded.clone(); 
+            actionsLog.push_back(clonedRestore);
         }
         else if (words[2] == "1")
         {
             AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::CITY);
             settlemntToBeAdded.act(*this);
+            BaseAction* clonedRestore = settlemntToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
         }
         else if (words[2] == "2")
         {
             AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::METROPOLIS);
             settlemntToBeAdded.act(*this);
+            BaseAction* clonedRestore = settlemntToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
         }
     }
     else if (words[0] == "restore")
@@ -359,16 +371,22 @@ void Simulation::actionHandler(const std::string &action)
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::LIFE_QUALITY, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
+            BaseAction* clonedRestore = faccilityToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
         }
         if (words[2] == "1")
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ECONOMY, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
+              BaseAction* clonedRestore = faccilityToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
         }
-        if (words[2] == "3")
+        if (words[2] == "2")
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ENVIRONMENT, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
+            BaseAction* clonedRestore = faccilityToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
         }
     }
     else if (words[0] == "plan")
@@ -377,10 +395,12 @@ void Simulation::actionHandler(const std::string &action)
         {
             AddPlan planToBeAdded(words[1], words[2]);
             planToBeAdded.act(*this);
+            BaseAction* clonedRestore = planToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
         }
         else
         {
-            std::cout << "ahi ze ihsov lo kaiam ma ata dba" << std::endl;
+            std::cout << "No settlement like this" << std::endl;
         }
     }
 
@@ -388,26 +408,33 @@ void Simulation::actionHandler(const std::string &action)
     {
         std::cout << "Call backup operation" << std::endl;
     }
-    else if (words[0] == "log")
-    {
-        std::cout << "Call log operation" << std::endl;
-    }
+
     else if (words[0] == "planStatus")
     {
         PrintPlanStatus planStatusToBeAdded = PrintPlanStatus(std::stoi(words[1]));
         planStatusToBeAdded.act(*this);
+        BaseAction* clonedRestore = planStatusToBeAdded.clone();
+        actionsLog.push_back(clonedRestore);
     }
     if (words[0] == "step")
     {
         SimulateStep simulateStepToBeAdded = SimulateStep(std::stoi(words[1]));
         simulateStepToBeAdded.act(*this);
+         BaseAction* clonedRestore = simulateStepToBeAdded.clone();
+        actionsLog.push_back(clonedRestore);
     }
     if (words[0] == "changePlanPoliciy")
     {
-        std::cout << "were here";
         ChangePlanPolicy changePlanPolicyToBeAdded = ChangePlanPolicy(std::stoi(words[1]), words[2]);
-        int x = (words[2] == "bal");
-        int y = 5;
         changePlanPolicyToBeAdded.act(*this);
+        BaseAction* clonedRestore = changePlanPolicyToBeAdded.clone();
+        actionsLog.push_back(clonedRestore);
+    }
+}
+
+void Simulation::printLog() const{
+    for (BaseAction *action : actionsLog)
+    {
+         std::cout << action->toString() << std::endl;
     }
 }

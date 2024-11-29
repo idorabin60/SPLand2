@@ -77,6 +77,10 @@ void Plan::step()
             if (underConstruction[i]->step() == FacilityStatus::OPERATIONAL)
             {
                 facilities.push_back(underConstruction[i]);             // Move the facility to operational list
+                  //update the scores 
+                life_quality_score+=underConstruction[i]->getLifeQualityScore();
+                economy_score+=underConstruction[i]->getEconomyScore();
+                environment_score+=underConstruction[i]->getEnvironmentScore();
                 underConstruction.erase(underConstruction.begin() + i); // Remove the facility from underConstruction
                 --i;                                                    // Decrement to avoid skipping the next element after erase
             }

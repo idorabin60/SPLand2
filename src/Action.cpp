@@ -45,9 +45,9 @@ void SimulateStep::act(Simulation &simulation)
 const string SimulateStep::toString() const
 {
     if (getStatus() == ActionStatus::ERROR)
-        return ("STEP" + to_string(numOfSteps) + "ERROR");
+        return ("Action: Step " + to_string(numOfSteps) + " ERROR");
     else
-        return ("STEP" + to_string(numOfSteps) + "COMPLETED");
+        return ("Action: Step " + to_string(numOfSteps) + " COMPLETED");
 }
 
 SimulateStep *SimulateStep::clone() const
@@ -188,26 +188,9 @@ const string AddFacility::toString() const
         return ("Action: AddFacility COMPLETED!");
 }
 
-// //--------------------------//////
-// // ChangePlanPolicy Implementation
-// ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy)
-//     : BaseAction(), planId(planId), newPolicy(newPolicy) {}
-
-// void ChangePlanPolicy::act(Simulation &simulation) {
-//     Plan to_change = simulation.getPlan(planId);
-//      SelectionPolicy wanted_policy;
-//         if (selectionPolicy=="bal")
-//            wanted_policy = BalancedSelection(0,0,0);
-//         if(selectionPolicy=="eco")
-//            wanted_policy = EconomySelection();
-//         if (selectionPolicy=="sus")
-//             wanted_policy = SustainabilitySelection();
-//         else
-//            wanted_policy = NaiveSelection();
-//     to_change.setSelectionPolicy
-// }
 //--------------------------//////
 // ChangePlanPolicy Implementation
+
 ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy)
     : BaseAction(), planId(planId), newPolicy(newPolicy) {}
 
@@ -235,4 +218,25 @@ const string ChangePlanPolicy::toString() const
         return ("Action: ChangePlanPolicy ERROR!");
     else
         return ("Action: ChangePlanPolicy COMPLETED!");
+}
+
+//--------------------------//////
+// PrintActionsLog Implementation
+
+PrintActionsLog::PrintActionsLog() :BaseAction(){}
+
+void PrintActionsLog::act(Simulation &simulation){
+    simulation.printLog();
+}
+
+PrintActionsLog *PrintActionsLog::clone() const
+{
+    return new PrintActionsLog(*this);
+}
+const string PrintActionsLog::toString() const
+{
+    if (getStatus() == ActionStatus::ERROR)
+        return ("Action: PrintActionsLog ERROR!");
+    else
+        return ("Action: PrintActionsLog COMPLETED!");
 }

@@ -23,23 +23,26 @@ NaiveSelection *NaiveSelection::clone() const
 }
 
 // BalancedSelection Implementation
-BalancedSelection::BalancedSelection(int LifeQualityScore, int EconomyScore, int EnvironmentScore)
-    : LifeQualityScore(LifeQualityScore), EconomyScore(EconomyScore), EnvironmentScore(EnvironmentScore) {}
-const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
+BalancedSelection::BalancedSelection(int lifeQualityScore, int economyScore, int environmentScore)
+    : LifeQualityScore(lifeQualityScore), EconomyScore(economyScore), EnvironmentScore(environmentScore) {}
+const FacilityType &BalancedSelection::selectFacility(const std::vector<FacilityType> &facilitiesOptions)
 {
     int minDifference = std::numeric_limits<int>::max(); // Initialize to a very large number
     const FacilityType *bestFacility = nullptr;
 
     for (const FacilityType &facility : facilitiesOptions)
     {
-        int tempLifeQualityScore = LifeQualityScore + facility.getEconomyScore();
-        int tempEconomyScore = EconomyScore + facility.getEnvironmentScore();
-        int tempEnvironmentScore = EnvironmentScore + facility.getEconomyScore();
+        // Calculate temporary scores for the current facility
+        int tempLifeQualityScore = LifeQualityScore + facility.getLifeQualityScore();
+        int tempEconomyScore = EconomyScore + facility.getEconomyScore();
+        int tempEnvironmentScore = EnvironmentScore + facility.getEnvironmentScore();
 
+        // Calculate the score difference
         int maxScore = std::max({tempLifeQualityScore, tempEconomyScore, tempEnvironmentScore});
         int minScore = std::min({tempLifeQualityScore, tempEconomyScore, tempEnvironmentScore});
         int diff = maxScore - minScore;
 
+        // Check if this facility is better
         if (diff < minDifference)
         {
             minDifference = diff;
@@ -47,7 +50,16 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
         }
     }
 
-    return *bestFacility;
+    // Ensure a valid facility was found
+    if (bestFacility)
+    {
+        // Update the fields with the scores of the best facility
+        LifeQualityScore += bestFacility->getLifeQualityScore();
+        EconomyScore += bestFacility->getEconomyScore();
+        EnvironmentScore += bestFacility->getEnvironmentScore();
+    }
+
+    return *bestFacility; // Return the best facility
 }
 const string BalancedSelection::toString() const
 {

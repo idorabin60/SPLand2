@@ -86,7 +86,7 @@ AddPlan::AddPlan(const string &settlementName, const string &selectionPolicy)
 
 void AddPlan::act(Simulation &simulation)
 {
-    Settlement& settlement_to_addPlan = simulation.getSettlement(settlementName);
+    Settlement &settlement_to_addPlan = simulation.getSettlement(settlementName);
     SelectionPolicy *wanted_policy = nullptr;
     if (selectionPolicy == "bal")
         wanted_policy = new BalancedSelection(0, 0, 0);
@@ -120,17 +120,18 @@ AddPlan *AddPlan::clone() const
 
 AddSettlement::AddSettlement(const string &settlementName, SettlementType settlementType)
     : BaseAction(), settlementName(settlementName), settlementType(settlementType)
-{}
+{
+}
 
 void AddSettlement::act(Simulation &simulation)
 {
     if (!simulation.isSettlementExists(settlementName))
     {
-        Settlement* new_settlent = new Settlement(settlementName, settlementType);
+        Settlement *new_settlent = new Settlement(settlementName, settlementType);
         if (simulation.addSettlement(new_settlent))
             complete();
         else
-           error("Settlement already exsite");
+            error("Settlement already exsite");
     }
     else
     {
@@ -157,26 +158,31 @@ AddFacility::AddFacility(const string &facilityName,
                          const int lifeQualityScore,
                          const int economyScore,
                          const int environmentScore)
-    : BaseAction(),  // Calling the BaseAction constructor
+    : BaseAction(), // Calling the BaseAction constructor
       facilityName(facilityName),
       facilityCategory(facilityCategory),
       price(price),
       lifeQualityScore(lifeQualityScore),
       economyScore(economyScore),
-      environmentScore(environmentScore) {}
+      environmentScore(environmentScore)
+{
+}
 
-void AddFacility::act(Simulation &simulation) {
-    FacilityType new_facility = FacilityType(facilityName,facilityCategory,price,lifeQualityScore,economyScore,environmentScore);
+void AddFacility::act(Simulation &simulation)
+{
+    FacilityType new_facility = FacilityType(facilityName, facilityCategory, price, lifeQualityScore, economyScore, environmentScore);
     if (simulation.addFacility(new_facility))
         complete();
     else
-       std::cout << "Error!!" << std::endl;
+        std::cout << "Error!!" << std::endl;
 }
-AddFacility* AddFacility::clone() const {
+AddFacility *AddFacility::clone() const
+{
     return new AddFacility(*this);
 }
-const string AddFacility::toString() const {
-   if (getStatus() == ActionStatus::ERROR)
+const string AddFacility::toString() const
+{
+    if (getStatus() == ActionStatus::ERROR)
         return ("Action: AddFacility ERROR!");
     else
         return ("Action: AddFacility COMPLETED!");
@@ -200,3 +206,33 @@ const string AddFacility::toString() const {
 //            wanted_policy = NaiveSelection();
 //     to_change.setSelectionPolicy
 // }
+//--------------------------//////
+// ChangePlanPolicy Implementation
+ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy)
+    : BaseAction(), planId(planId), newPolicy(newPolicy) {}
+
+void ChangePlanPolicy::act(Simulation &simulation)
+{
+    Plan &to_change = simulation.getPlan(planId);
+    SelectionPolicy *wanted_policy = nullptr;
+    if (newPolicy == "bal")
+        wanted_policy = new BalancedSelection(0, 0, 0);
+    else if (newPolicy == "eco")
+        wanted_policy = new EconomySelection();
+    else if (newPolicy == "sus")
+        wanted_policy = new SustainabilitySelection();
+    else
+        wanted_policy = new NaiveSelection();
+    to_change.setSelectionPolicy(wanted_policy);
+}
+ChangePlanPolicy *ChangePlanPolicy::clone() const
+{
+    return new ChangePlanPolicy(*this);
+}
+const string ChangePlanPolicy::toString() const
+{
+    if (getStatus() == ActionStatus::ERROR)
+        return ("Action: ChangePlanPolicy ERROR!");
+    else
+        return ("Action: ChangePlanPolicy COMPLETED!");
+}

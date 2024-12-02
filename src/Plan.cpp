@@ -19,6 +19,24 @@ Plan::Plan(const int planId,
       environment_score(0)
 {
 }
+Plan::Plan(const int planId,
+           const Settlement &settlement,
+           SelectionPolicy *selectionPolicy,
+           const std::vector<FacilityType> &facilityOptions,
+           int life_quality_score,
+           int economy_score,
+           int environment_score,
+           std::vector<Facility *> facilities,
+           std::vector<Facility *> underConstruction)
+    : Plan(planId, settlement, selectionPolicy, facilityOptions) // Delegate to first constructor
+{
+    // Additional initialization
+    this->life_quality_score = life_quality_score;
+    this->economy_score = economy_score;
+    this->environment_score = environment_score;
+    this->facilities = std::move(facilities);
+    this->underConstruction = std::move(underConstruction);
+}
 
 const int Plan::getlifeQualityScore() const
 {
@@ -32,11 +50,12 @@ const int Plan::getEconomyScore() const
 {
     return economy_score;
 }
-// Get all completed facillities
-const vector<Facility *> &Plan::getFacilities() const
+
+const std::vector<Facility *> &Plan::getUnderConstruction() const
 {
-    return facilities;
+    return underConstruction;
 }
+
 void Plan::addFacility(Facility *facility)
 {
     if (facility->getStatus() == FacilityStatus::OPERATIONAL)
@@ -76,11 +95,11 @@ void Plan::step()
         {
             if (underConstruction[i]->step() == FacilityStatus::OPERATIONAL)
             {
-                facilities.push_back(underConstruction[i]);             // Move the facility to operational list
-                  //update the scores 
-                life_quality_score+=underConstruction[i]->getLifeQualityScore();
-                economy_score+=underConstruction[i]->getEconomyScore();
-                environment_score+=underConstruction[i]->getEnvironmentScore();
+                facilities.push_back(underConstruction[i]); // Move the facility to operational list
+                                                            // update the scores
+                life_quality_score += underConstruction[i]->getLifeQualityScore();
+                economy_score += underConstruction[i]->getEconomyScore();
+                environment_score += underConstruction[i]->getEnvironmentScore();
                 underConstruction.erase(underConstruction.begin() + i); // Remove the facility from underConstruction
                 --i;                                                    // Decrement to avoid skipping the next element after erase
             }
@@ -172,8 +191,26 @@ Plan::~Plan()
         delete facility;
     }
 
-    for (Facility *facility : underConstruction)
+    for (Facility *facilityUnderConstructions : underConstruction)
     {
-        delete facility;
+        delete facilityUnderConstructions;
     }
+}
+const string &Plan::getSettlement() const
+{
+    return settlement.getName();
+}
+
+const vector<Facility *> &Plan::getFacilities() const
+{
+    return facilities;
+}
+
+int Plan::getPlanId() const
+{
+    return plan_id;
+}
+SelectionPolicy *Plan::getSelectionPolicy() const
+{
+    return selectionPolicy;
 }

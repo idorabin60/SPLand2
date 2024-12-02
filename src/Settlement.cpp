@@ -42,4 +42,3 @@ const string Settlement::toString() const
     // Use simple concatenation to construct the output
     return "Settlement Name: " + name + "\n" + "Settlement Type: " + typeStr + "\n";
 }
-

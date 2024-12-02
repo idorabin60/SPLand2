@@ -4,6 +4,8 @@
 #include "Facility.h"
 #include "Plan.h"
 #include "Settlement.h"
+#include "globals.h"
+
 using std::string;
 using std::vector;
 
@@ -31,10 +33,10 @@ public:
     // ido functions:
     SelectionPolicy *createSelectionPolicy(const std::string &policyType);
     void actionHandler(const std::string &action);
-    //Dafna function: 
+    // Dafna function:
     void printLog() const;
-     void backup();
-     void restore();
+    void backup();
+    void restore();
 
     // ///rule of 5
     // //Constructor,Destructor - alreadey did
@@ -54,12 +56,10 @@ private:
     vector<Plan> plans;
     vector<Settlement *> settlements;
     vector<FacilityType> facilitiesOptions;
-    //dafna add
-     Simulation *backupSim;
+    // dafna add
 
-     /// i need to fix thr backupsim at initail not to nullput instand the config filer
+    /// i need to fix thr backupsim at initail not to nullput instand the config filer
 
-    
     // Helper methods for parsing configuration
     void parseConfig(const std::string &configFilePath);
     void handleSettlementCommand(const std::vector<std::string> &arguments);

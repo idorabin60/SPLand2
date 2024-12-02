@@ -506,7 +506,6 @@ Simulation &Simulation::operator=(const Simulation &other)
     }
 
     actionsLog.clear();
-    settlements.clear();
     plans.clear();
 
     // Copy simple members
@@ -518,6 +517,8 @@ Simulation &Simulation::operator=(const Simulation &other)
     {
         delete settlement;
     }
+    settlements.clear();
+
     for (const auto *settlement : other.settlements)
     {
         settlements.push_back(new Settlement(*settlement));

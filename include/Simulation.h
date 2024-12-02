@@ -33,6 +33,19 @@ public:
     void actionHandler(const std::string &action);
     //Dafna function: 
     void printLog() const;
+     void backup();
+     void restore();
+
+    // ///rule of 5
+    // //Constructor,Destructor - alreadey did
+    // // Copy constructor
+    Simulation(const Simulation &other);
+    // // Copy assignment operator
+    Simulation &operator=(const Simulation &other);
+    // // Move constructor
+    Simulation(Simulation &&other) noexcept;
+    // // Move assignment operator
+    Simulation &operator=(Simulation &&other) noexcept;
 
 private:
     bool isRunning;
@@ -41,7 +54,12 @@ private:
     vector<Plan> plans;
     vector<Settlement *> settlements;
     vector<FacilityType> facilitiesOptions;
+    //dafna add
+     Simulation *backupSim;
 
+     /// i need to fix thr backupsim at initail not to nullput instand the config filer
+
+    
     // Helper methods for parsing configuration
     void parseConfig(const std::string &configFilePath);
     void handleSettlementCommand(const std::vector<std::string> &arguments);

@@ -130,7 +130,6 @@ class BackupSimulation : public BaseAction {
     private:
 };
 
-
 class RestoreSimulation : public BaseAction {
     public:
         RestoreSimulation();

@@ -1,5 +1,6 @@
 #include "Simulation.h"
 #include <iostream>
+#include "globals.h"
 
 using namespace std;
 

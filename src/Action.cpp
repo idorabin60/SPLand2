@@ -223,9 +223,10 @@ const string ChangePlanPolicy::toString() const
 //--------------------------//////
 // PrintActionsLog Implementation
 
-PrintActionsLog::PrintActionsLog() :BaseAction(){}
+PrintActionsLog::PrintActionsLog() : BaseAction() {}
 
-void PrintActionsLog::act(Simulation &simulation){
+void PrintActionsLog::act(Simulation &simulation)
+{
     simulation.printLog();
 }
 
@@ -241,24 +242,26 @@ const string PrintActionsLog::toString() const
         return ("Action: PrintActionsLog COMPLETED!");
 }
 
-
 // Default Constructor
 BackupSimulation::BackupSimulation() {}
 
 // Action method
-void BackupSimulation::act(Simulation &simulation) {
+void BackupSimulation::act(Simulation &simulation)
+{
     simulation.backup();
     complete(); // Mark the action as complete
 }
 
 // Clone method
-BackupSimulation *BackupSimulation::clone() const {
+BackupSimulation *BackupSimulation::clone() const
+{
     return new BackupSimulation(*this); // Create a copy of the object
 }
 
 // Convert to string method
-const string BackupSimulation::toString() const {
-       if (getStatus() == ActionStatus::ERROR)
+const string BackupSimulation::toString() const
+{
+    if (getStatus() == ActionStatus::ERROR)
         return ("Action: BackupSimulation ERROR!");
     else
         return ("Action: BackupSimulation COMPLETED!");
@@ -268,19 +271,22 @@ const string BackupSimulation::toString() const {
 RestoreSimulation::RestoreSimulation() {}
 
 // Action method
-void RestoreSimulation::act(Simulation &simulation) {
+void RestoreSimulation::act(Simulation &simulation)
+{
     simulation.restore();
-    complete(); 
+    complete();
 }
 
 // Clone method
-RestoreSimulation *RestoreSimulation::clone() const {
+RestoreSimulation *RestoreSimulation::clone() const
+{
     return new RestoreSimulation(*this); // Create a copy of the object
 }
 
 // Convert to string method
-const string RestoreSimulation::toString() const {
-     if (getStatus() == ActionStatus::ERROR)
+const string RestoreSimulation::toString() const
+{
+    if (getStatus() == ActionStatus::ERROR)
         return ("Action: RestoreSimulation ERROR!");
     else
         return ("Action: RestoreSimulation COMPLETED!");

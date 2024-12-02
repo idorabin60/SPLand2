@@ -13,14 +13,14 @@
 #include "Plan.h"
 #include <sstream>
 using namespace std;
+Simulation *backupSim = nullptr;
 
 // Constructor
 Simulation::Simulation(const std::string &configFilePath)
-    : isRunning(false), planCounter(0), backupSim(nullptr) // Initialize fields
+    : isRunning(false), planCounter(0) // Initialize fields
 {
     parseConfig(configFilePath);
 }
-
 
 // Function to parse configuration file
 void Simulation::parseConfig(const std::string &configFilePath)
@@ -167,7 +167,6 @@ void Simulation::start()
     {
         std::cout << "Type an action (or 'close' to stop): ";
         std::getline(std::cin, action); // Use getline to capture the entire input line
-
         if (action == "close")
         {
             std::cout << "Simulation finished." << std::endl;
@@ -176,6 +175,7 @@ void Simulation::start()
 
         actionHandler(action); // Handle the full line of input
     }
+    delete backupSim;
 
     isRunning = false; // Mark simulation as stopped
 }
@@ -324,10 +324,11 @@ std::vector<std::string> parseToWords(const std::string &input)
 void Simulation::actionHandler(const std::string &action)
 {
     std::vector<std::string> words = parseToWords(action);
-    if (words[0]=="log"){
-        PrintActionsLog printLog = PrintActionsLog(); 
+    if (words[0] == "log")
+    {
+        PrintActionsLog printLog = PrintActionsLog();
         printLog.act(*this);
-        BaseAction* clonedRestore = printLog.clone(); 
+        BaseAction *clonedRestore = printLog.clone();
         actionsLog.push_back(clonedRestore);
     }
     if (words[0] == "settlement")
@@ -336,21 +337,21 @@ void Simulation::actionHandler(const std::string &action)
         {
             AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::VILLAGE);
             settlemntToBeAdded.act(*this);
-            BaseAction* clonedRestore = settlemntToBeAdded.clone(); 
+            BaseAction *clonedRestore = settlemntToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
         else if (words[2] == "1")
         {
             AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::CITY);
             settlemntToBeAdded.act(*this);
-            BaseAction* clonedRestore = settlemntToBeAdded.clone();
+            BaseAction *clonedRestore = settlemntToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
         else if (words[2] == "2")
         {
             AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::METROPOLIS);
             settlemntToBeAdded.act(*this);
-            BaseAction* clonedRestore = settlemntToBeAdded.clone();
+            BaseAction *clonedRestore = settlemntToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
     }
@@ -358,7 +359,7 @@ void Simulation::actionHandler(const std::string &action)
     {
         RestoreSimulation restoreToDo = RestoreSimulation();
         restoreToDo.act(*this);
-        BaseAction* clonedRestore = restoreToDo.clone();
+        BaseAction *clonedRestore = restoreToDo.clone();
         actionsLog.push_back(clonedRestore);
     }
     else if (words[0] == "facility")
@@ -367,21 +368,21 @@ void Simulation::actionHandler(const std::string &action)
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::LIFE_QUALITY, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
-            BaseAction* clonedRestore = faccilityToBeAdded.clone();
+            BaseAction *clonedRestore = faccilityToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
         if (words[2] == "1")
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ECONOMY, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
-              BaseAction* clonedRestore = faccilityToBeAdded.clone();
+            BaseAction *clonedRestore = faccilityToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
         if (words[2] == "2")
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ENVIRONMENT, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
-            BaseAction* clonedRestore = faccilityToBeAdded.clone();
+            BaseAction *clonedRestore = faccilityToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
     }
@@ -391,7 +392,7 @@ void Simulation::actionHandler(const std::string &action)
         {
             AddPlan planToBeAdded(words[1], words[2]);
             planToBeAdded.act(*this);
-            BaseAction* clonedRestore = planToBeAdded.clone();
+            BaseAction *clonedRestore = planToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
         else
@@ -402,42 +403,42 @@ void Simulation::actionHandler(const std::string &action)
 
     else if (words[0] == "backup")
     {
-            BackupSimulation backupToDo = BackupSimulation();
-            backupToDo.act(*this);
-            BaseAction* clonedRestore = backupToDo.clone();
-            actionsLog.push_back(clonedRestore);
+        BackupSimulation backupToDo = BackupSimulation();
+        backupToDo.act(*this);
+        BaseAction *clonedRestore = backupToDo.clone();
+        actionsLog.push_back(clonedRestore);
     }
 
     else if (words[0] == "planStatus")
     {
         PrintPlanStatus planStatusToBeAdded = PrintPlanStatus(std::stoi(words[1]));
         planStatusToBeAdded.act(*this);
-        BaseAction* clonedRestore = planStatusToBeAdded.clone();
+        BaseAction *clonedRestore = planStatusToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
     }
     if (words[0] == "step")
     {
         SimulateStep simulateStepToBeAdded = SimulateStep(std::stoi(words[1]));
         simulateStepToBeAdded.act(*this);
-         BaseAction* clonedRestore = simulateStepToBeAdded.clone();
+        BaseAction *clonedRestore = simulateStepToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
     }
     if (words[0] == "changePlanPoliciy")
     {
         ChangePlanPolicy changePlanPolicyToBeAdded = ChangePlanPolicy(std::stoi(words[1]), words[2]);
         changePlanPolicyToBeAdded.act(*this);
-        BaseAction* clonedRestore = changePlanPolicyToBeAdded.clone();
+        BaseAction *clonedRestore = changePlanPolicyToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
     }
 }
 
-void Simulation::printLog() const{
+void Simulation::printLog() const
+{
     for (BaseAction *action : actionsLog)
     {
-         std::cout << action->toString() << std::endl;
+        std::cout << action->toString() << std::endl;
     }
 }
-
 
 //   // Destructor
 //     ~Simulation();
@@ -450,19 +451,25 @@ void Simulation::printLog() const{
 //     // Move assignment operator
 //     Simulation &operator=(Simulation &&other) noexcept;
 
-
-// //// RULE OF 5 
+// //// RULE OF 5
 // Destructor
-Simulation::~Simulation() {
-    delete backupSim;
-    for (BaseAction* action : actionsLog) {
-        if(action) delete action;
-        action=nullptr;
+Simulation::~Simulation()
+{
+    for (BaseAction *action : actionsLog)
+    {
+        if (action)
+            delete action;
+        action = nullptr;
     }
-    for (Settlement* settlement : settlements) {
-         if(settlement) delete settlement;
-        settlement=nullptr;
+    for (Settlement *settlement : settlements)
+    {
+        if (settlement)
+            delete settlement;
+        settlement = nullptr;
     }
+    settlements.clear(); // Clear the vector
+    plans.clear();
+    facilitiesOptions.clear(); // Destructor of each FacilityType is automatically called
 }
 
 // Copy constructor
@@ -470,62 +477,84 @@ Simulation::Simulation(const Simulation &other)
     : isRunning(other.isRunning),
       planCounter(other.planCounter),
       plans(other.plans),
-      facilitiesOptions(other.facilitiesOptions), backupSim(other.backupSim) {
+      facilitiesOptions(other.facilitiesOptions) // Removed comma
+
+{
     // Deep copy for dynamically allocated objects
-    for (auto *action : other.actionsLog) {
+    for (auto *action : other.actionsLog)
+    {
         actionsLog.push_back(action->clone());
     }
-    for (auto *settlement : other.settlements) {
+    for (auto *settlement : other.settlements)
+    {
         settlements.push_back(new Settlement(*settlement));
     }
 }
 
 // Copy assignment operator
-Simulation &Simulation::operator=(const Simulation &other) {
-     if (this == &other) {
+Simulation &Simulation::operator=(const Simulation &other)
+{
+    if (this == &other)
+    {
         return *this; // Prevent self-assignment
     }
-    delete backupSim;
-    // Cleanup current resources for actionsLog (which holds pointers)
-    for (auto* action : actionsLog) {
-        delete action; // Delete the dynamically allocated BaseAction objects
-    }
-    actionsLog.clear(); // Clear the vector
 
-    // Cleanup current resources for settlements (which holds pointers)
-    for (auto* settlement : settlements) {
-        delete settlement; // Delete dynamically allocated Settlement objects
+    // Cleanup existing resources
+    for (auto *action : actionsLog)
+    {
+        delete action;
     }
-    settlements.clear(); // Clear the vector
 
-    // Cleanup current resources for plans (Plan is non-pointer, so we copy directly)
-    plans.clear();  // Just clear the vector since Plan is not a pointer
+    actionsLog.clear();
+    settlements.clear();
+    plans.clear();
 
     // Copy simple members
     isRunning = other.isRunning;
     planCounter = other.planCounter;
 
-    // Copy plans (no deep copy needed since Plan is not a pointer)
-    for (const auto& plan : other.plans) {
-        plans.push_back(plan);  // Assuming Plan has a copy constructor
+    // Deep copy settlements
+    for (auto *settlement : settlements)
+    {
+        delete settlement;
+    }
+    for (const auto *settlement : other.settlements)
+    {
+        settlements.push_back(new Settlement(*settlement));
     }
 
-    // Copy facilitiesOptions (no deep copy needed since FacilityType is not a pointer)
-    for (const auto& facility : other.facilitiesOptions) {
-        facilitiesOptions.push_back(facility); // Copy each FacilityType object
+    for (const auto &plan : other.plans)
+    {
+        const std::string &settlementName = plan.getSettlement(); // Get the name of the settlement
+        Settlement *newSettlement = nullptr;
+
+        for (auto *sett : settlements)
+        {
+            if (sett->getName() == settlementName)
+            {
+                newSettlement = sett;
+                break;
+            }
+        }
+
+        if (newSettlement)
+        {
+            plans.emplace_back(plan.getPlanId(), *newSettlement, plan.getSelectionPolicy()->clone(), facilitiesOptions, plan.getlifeQualityScore(), plan.getEconomyScore(), plan.getEnvironmentScore(), plan.getFacilities(), plan.getUnderConstruction());
+        }
+        else
+        {
+            throw std::runtime_error("Settlement not found: " + settlementName);
+        }
     }
 
-    // Copy dynamically allocated objects for actionsLog and settlements
-    for (const auto* action : other.actionsLog) {
-        actionsLog.push_back(action->clone());  // Assuming clone() method is available in BaseAction
-    }
-    for (const auto* settlement : other.settlements) {
-        settlements.push_back(new Settlement(*settlement));  // Assuming the copy constructor for Settlement is available
+    // Copy actionsLog
+    for (const auto *action : other.actionsLog)
+    {
+        actionsLog.push_back(action->clone());
     }
 
-    return *this; // Return *this to allow chained assignment
+    return *this;
 }
-
 
 // Move constructor
 Simulation::Simulation(Simulation &&other) noexcept
@@ -534,25 +563,28 @@ Simulation::Simulation(Simulation &&other) noexcept
       actionsLog(std::move(other.actionsLog)),
       plans(std::move(other.plans)),
       settlements(std::move(other.settlements)),
-      facilitiesOptions(std::move(other.facilitiesOptions)),
-      backupSim(other.backupSim ? new Simulation(*other.backupSim) : nullptr){
+      facilitiesOptions(std::move(other.facilitiesOptions))
+{
     // Nullify the moved-from object's state
     other.isRunning = false;
     other.planCounter = 0;
 }
 
 // Move assignment operator
-Simulation &Simulation::operator=(Simulation &&other) noexcept {
-    if (this == &other) {
+Simulation &Simulation::operator=(Simulation &&other) noexcept
+{
+    if (this == &other)
+    {
         return *this;
     }
 
     // Cleanup current resources
-    delete backupSim;
-    for (auto *action : actionsLog) {
+    for (auto *action : actionsLog)
+    {
         delete action;
     }
-    for (auto *settlement : settlements) {
+    for (auto *settlement : settlements)
+    {
         delete settlement;
     }
 
@@ -567,9 +599,6 @@ Simulation &Simulation::operator=(Simulation &&other) noexcept {
     settlements = std::move(other.settlements);
     facilitiesOptions = std::move(other.facilitiesOptions);
 
-    backupSim = other.backupSim;
-    other.backupSim = nullptr;  // Ensure the other object does not have a backup
-
     // Nullify the moved-from object's state
     other.isRunning = false;
     other.planCounter = 0;
@@ -577,21 +606,25 @@ Simulation &Simulation::operator=(Simulation &&other) noexcept {
     return *this;
 }
 
-void Simulation::backup() {
+void Simulation::backup()
+{
     // If there's an existing backup, delete it to avoid memory leaks
-    if (backupSim != nullptr) {
+    if (backupSim != nullptr)
+    {
         delete backupSim;
     }
 
     // Create a deep copy of the current simulation and store it in backupSimulation
-    backupSim = new Simulation(*this);  // Uses the copy constructor
+    backupSim = new Simulation(*this); // Uses the copy constructor
 }
 
-void Simulation::restore() {
-    if (backupSim == nullptr) {
+void Simulation::restore()
+{
+    if (backupSim == nullptr)
+    {
         std::cout << "No backup available!" << std::endl;
         return;
     }
     // Restore the state from the backup
-    *this = *backupSim;  // Uses the copy assignment operator
+    *this = *backupSim; // Uses the copy assignment operator
 }

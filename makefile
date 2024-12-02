@@ -27,3 +27,7 @@ prepare:
 # Run the simulation with the config file
 run:
 	./bin/simulation ./config_file.txt
+
+# Run the program with valgrind to check for memory leaks
+valgrind: link
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./bin/simulation ./config_file.txt

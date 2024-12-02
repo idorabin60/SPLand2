@@ -455,7 +455,6 @@ void Simulation::printLog() const
 // Destructor
 Simulation::~Simulation()
 {
-    delete backupSim;
     for (BaseAction *action : actionsLog)
     {
         if (action)
@@ -468,6 +467,9 @@ Simulation::~Simulation()
             delete settlement;
         settlement = nullptr;
     }
+    settlements.clear(); // Clear the vector
+    plans.clear();
+    facilitiesOptions.clear(); // Destructor of each FacilityType is automatically called
 }
 
 // Copy constructor

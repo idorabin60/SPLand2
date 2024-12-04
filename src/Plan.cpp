@@ -84,6 +84,7 @@ void Plan::printStatus()
 }
 void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy)
 {
+    delete selectionPolicy;
     selectionPolicy = newSelectionPolicy;
 }
 void Plan::step()

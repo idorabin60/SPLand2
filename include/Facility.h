@@ -22,6 +22,8 @@ class FacilityType
 public:
     FacilityType(const string &name, const FacilityCategory category, const int price, const int lifeQuality_score, const int economy_score, const int environment_score);
     const string &getName() const;
+    virtual ~FacilityType() = default; // Virtual destructor
+
     int getCost() const;
     int getLifeQualityScore() const;
     int getEnvironmentScore() const;
@@ -45,6 +47,8 @@ public:
     Facility(const string &name, const string &settlementName, const FacilityCategory category, const int price, const int lifeQuality_score, const int economy_score, const int environment_score);
     Facility(const FacilityType &type, const string &settlementName);
     const string &getSettlementName() const;
+    virtual ~Facility() override = default; // Virtual destructor
+
     const int getTimeLeft() const;
     FacilityStatus step();
     void setStatus(FacilityStatus status);

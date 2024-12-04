@@ -28,14 +28,17 @@ Plan::Plan(const int planId,
            int environment_score,
            std::vector<Facility *> facilities,
            std::vector<Facility *> underConstruction)
-    : Plan(planId, settlement, selectionPolicy, facilityOptions) // Delegate to first constructor
+    : plan_id(planId),
+      settlement(settlement),
+      selectionPolicy(selectionPolicy),
+      status(PlanStatus::AVALIABLE),
+      facilityOptions(facilityOptions),
+      life_quality_score(life_quality_score),
+      economy_score(economy_score),
+      environment_score(environment_score),
+      facilities(std::move(facilities)),              // Move the ownership
+      underConstruction(std::move(underConstruction)) // Move the ownership
 {
-    // Additional initialization
-    this->life_quality_score = life_quality_score;
-    this->economy_score = economy_score;
-    this->environment_score = environment_score;
-    this->facilities = std::move(facilities);
-    this->underConstruction = std::move(underConstruction);
 }
 
 const int Plan::getlifeQualityScore() const
@@ -84,6 +87,7 @@ void Plan::printStatus()
 }
 void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy)
 {
+    delete selectionPolicy; // Free the old memory
     selectionPolicy = newSelectionPolicy;
 }
 void Plan::step()
@@ -153,33 +157,40 @@ Plan::Plan(const Plan &other)
       selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr), // Deep copy selectionPolicy
       status(other.status),
       facilityOptions(other.facilityOptions),
+      facilities(),
+      underConstruction(),
       life_quality_score(other.life_quality_score),
       economy_score(other.economy_score),
       environment_score(other.environment_score)
 {
     // Deep copy the facilities vector
-    for (int i = 0; i < other.facilities.size(); i++)
+    for (Facility *facility : other.facilities)
     {
-        facilities.push_back(other.facilities.at(i)->clone());
+        facilities.push_back(facility->clone());
     }
-    for (int i = 0; i < other.underConstruction.size(); i++)
+
+    // Deep copy the underConstruction vector
+    for (Facility *facility : other.underConstruction)
     {
-        underConstruction.push_back(other.underConstruction.at(i)->clone());
+        underConstruction.push_back(facility->clone());
     }
 }
+
 Plan::Plan(Plan &&other)
     : plan_id(other.plan_id),
-      settlement(other.settlement),           // Reference is copied
-      selectionPolicy(other.selectionPolicy), // Pointer is moved
+      settlement(other.settlement),
+      selectionPolicy(other.selectionPolicy),
+      facilities(std::move(other.facilities)),
+      underConstruction(std::move(other.underConstruction)),
+      facilityOptions(other.facilityOptions),
       status(other.status),
-      facilities(std::move(other.facilities)),               // Vector is moved
-      underConstruction(std::move(other.underConstruction)), // Vector is moved
-      facilityOptions(other.facilityOptions),                // Reference is copied
       life_quality_score(other.life_quality_score),
       economy_score(other.economy_score),
       environment_score(other.environment_score)
 {
-    other.selectionPolicy = nullptr; // Nullify source pointer to avoid double deletion
+    other.selectionPolicy = nullptr;
+    other.facilities.clear();
+    other.underConstruction.clear();
 }
 
 Plan::~Plan()
@@ -190,12 +201,15 @@ Plan::~Plan()
     {
         delete facility;
     }
+    facilities.clear(); // Clear the vector to avoid dangling pointers
 
     for (Facility *facilityUnderConstructions : underConstruction)
     {
         delete facilityUnderConstructions;
     }
+    underConstruction.clear(); // Clear the vector to avoid dangling pointers
 }
+
 const std::string &Plan::getSettlement() const
 {
     if (&settlement == nullptr)

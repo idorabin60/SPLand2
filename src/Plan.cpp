@@ -196,8 +196,12 @@ Plan::~Plan()
         delete facilityUnderConstructions;
     }
 }
-const string &Plan::getSettlement() const
+const std::string &Plan::getSettlement() const
 {
+    if (&settlement == nullptr)
+    {
+        throw std::runtime_error("Invalid Settlement reference in Plan.");
+    }
     return settlement.getName();
 }
 

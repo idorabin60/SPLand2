@@ -269,9 +269,8 @@ Settlement &Simulation::getSettlement(const string &settlementName)
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy)
 {
     Settlement s = settlement;
-    Plan *new_plan = new Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
-    plans.push_back((*new_plan));
-    delete new_plan;
+    Plan new_plan = Plan(planCounter, settlement, selectionPolicy, facilitiesOptions);
+    plans.push_back((new_plan));
     planCounter++;
 }
 ////

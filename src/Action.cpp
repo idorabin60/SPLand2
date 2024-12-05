@@ -5,7 +5,7 @@
 using namespace std;
 
 // Constructor and generic methods
-BaseAction::BaseAction() : status(ActionStatus::ERROR), errorMsg("") {}
+BaseAction::BaseAction() : errorMsg(""), status(ActionStatus::ERROR) {}
 void BaseAction::complete()
 {
     status = ActionStatus::COMPLETED;
@@ -35,7 +35,7 @@ SimulateStep::SimulateStep(const int numOfSteps) : BaseAction(), numOfSteps(numO
 
 void SimulateStep::act(Simulation &simulation)
 {
-    for (int i = 0; i < numOfSteps; i++)
+    for (int i = 1; i <= numOfSteps; i++)
     {
         simulation.step();
     }
@@ -199,7 +199,7 @@ void ChangePlanPolicy::act(Simulation &simulation)
     Plan &to_change = simulation.getPlan(planId);
     SelectionPolicy *wanted_policy = nullptr;
     if (newPolicy == "bal")
-        wanted_policy = new BalancedSelection(0, 0, 0);
+        wanted_policy = new BalancedSelection(to_change.getlifeQualityScore(), to_change.getEconomyScore(), to_change.getEnvironmentScore());
     else if (newPolicy == "eco")
         wanted_policy = new EconomySelection();
     else if (newPolicy == "sus")

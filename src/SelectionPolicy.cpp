@@ -79,7 +79,7 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
         throw std::runtime_error("No facilities available to select from.");
     }
 
-    for (int i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
+    for (std::vector<FacilityType>::size_type i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
     {
         if (facilitiesOptions[i].getCategory() == FacilityCategory::ECONOMY)
         {
@@ -117,7 +117,7 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
         throw std::runtime_error("No facilities available to select from.");
     }
 
-    for (int i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
+    for (std::vector<FacilityType>::size_type i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
     {
         if (facilitiesOptions[i].getCategory() == FacilityCategory::ENVIRONMENT)
         {

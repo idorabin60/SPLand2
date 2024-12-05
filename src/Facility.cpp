@@ -59,11 +59,11 @@ const int Facility::getTimeLeft() const
 
 FacilityStatus Facility::step()
 {
-    if (timeLeft > 0)
+    if (timeLeft > 2)
     {
         timeLeft--; // Reduce timeLeft
     }
-    if (timeLeft == 0)
+   else
     {
         status = FacilityStatus::OPERATIONAL;
     }
@@ -79,12 +79,23 @@ const FacilityStatus &Facility::getStatus() const
 {
     return status;
 }
+
+
+const string Facility::getStatusString() const
+{
+    if (getStatus()==FacilityStatus::UNDER_CONSTRUCTIONS){
+        return "UNDER_CONSTRUCTION";
+    }
+    else{
+    return "OPERATIONAL";
+    }
+}
 Facility *Facility::clone() const
 {
     return new Facility(*this);
 }
 
-std::string FacilityStatusToString(FacilityStatus status)
+std::string facilityStatusToString(FacilityStatus status)
 {
     switch (status)
     {
@@ -103,7 +114,7 @@ const string Facility::toString() const
     std::ostringstream oss;
     oss << "Facility: " << getName()
         << ", Settlement: " << getSettlementName()
-        << ", Status: " << FacilityStatusToString(getStatus())
+        << ", Status: " << facilityStatusToString(getStatus())
         << ", Time Left: " << getTimeLeft();
     return oss.str();
 }

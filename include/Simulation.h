@@ -15,13 +15,14 @@ class SelectionPolicy;
 class Simulation
 {
 public:
-    Simulation(const string &configFilePath); // done
+    Simulation(const string &configFilePath); 
     void start();
     void addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy);
     void addAction(BaseAction *action);
     bool addSettlement(Settlement *settlement);
     bool addFacility(FacilityType facility);
     bool isSettlementExists(const string &settlementName);
+    bool isPlanIdExsits(const int planID);
     Settlement &getSettlement(const string &settlementName);
     Plan &getPlan(const int planID);
     void step();
@@ -30,23 +31,15 @@ public:
     void parseConfigFile(const std::string &configFilePath);
     void printInitialState() const;
     ~Simulation();
-    // ido functions:
     SelectionPolicy *createSelectionPolicy(const std::string &policyType);
     void actionHandler(const std::string &action);
-    // Dafna function:
     void printLog() const;
     void backup();
     void restore();
-
-    // ///rule of 5
-    // //Constructor,Destructor - alreadey did
-    // // Copy constructor
+    //rule of 5
     Simulation(const Simulation &other);
-    // // Copy assignment operator
     Simulation &operator=(const Simulation &other);
-    // // Move constructor
     Simulation(Simulation &&other) noexcept;
-    // // Move assignment operator
     Simulation &operator=(Simulation &&other) noexcept;
 
 private:
@@ -56,11 +49,6 @@ private:
     vector<Plan> plans;
     vector<Settlement *> settlements;
     vector<FacilityType> facilitiesOptions;
-    // dafna add
-
-    /// i need to fix thr backupsim at initail not to nullput instand the config filer
-
-    // Helper methods for parsing configuration
     void parseConfig(const std::string &configFilePath);
     void handleSettlementCommand(const std::vector<std::string> &arguments);
     void handleFacilityCommand(const std::vector<std::string> &arguments);

@@ -10,10 +10,10 @@ Plan::Plan(const int planId,
     : plan_id(planId),
       settlement(settlement),
       selectionPolicy(selectionPolicy),
-      status(PlanStatus::AVALIABLE),
-      facilityOptions(facilityOptions), // Initialize reference to facilityOptions
+      status(PlanStatus::AVALIABLE), 
       facilities(),                     // Explicitly initialize as empty (optional, default behavior)
-      underConstruction(),              // Explicitly initialize as empty (optional, default behavior)
+      underConstruction(), 
+      facilityOptions(facilityOptions), 
       life_quality_score(0),
       economy_score(0),
       environment_score(0)
@@ -92,7 +92,7 @@ void Plan::step()
     if (status == PlanStatus::BUSY)
     {
         // If the status of the plan is busy, iterate through all facilities and step them
-        for (int i = 0; i < underConstruction.size(); ++i)
+        for (std::vector<Facility*>::size_type i=0; i < underConstruction.size(); ++i)
         {
             if (underConstruction[i]->step() == FacilityStatus::OPERATIONAL)
             {
@@ -134,17 +134,20 @@ const std::string Plan::toString() const
 {
     std::ostringstream oss;
     oss << "PlanID: " << plan_id << "\n";
-    oss << "SettlementName" << settlement.getName() << "\n";
-    oss << "SelectionPolicy" << selectionPolicy->toString() << "\n";
+    oss << "SettlementName: " << settlement.getName() << "\n";
     oss << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "Available" : "Busy") << "\n";
-    oss << "Life Quality Score: " << life_quality_score << "\n";
-    oss << "Economy Score: " << economy_score << "\n";
-    oss << "Environment Score: " << environment_score << "\n";
-    oss << "Facilities: " << facilities.size() << " completed\n";
-    oss << "Under Construction: " << underConstruction.size() << " facilities:\n";
+    oss << "SelectionPolicy: " << selectionPolicy->toString() << "\n";
+    oss << "LifeQualityScore: " << life_quality_score << "\n";
+    oss << "EconomyScore: " << economy_score << "\n";
+    oss << "EnvironmentScore: " << environment_score << "\n";
+    for (Facility *fas : facilities){
+        oss << "FacilityName: " << fas->getName()<< "\n";
+        oss << "FacilityStatus: " << fas->getStatusString()<< "\n";
+    }
     for (Facility *fac : underConstruction)
     {
-        oss << fac->getName() << "\n";
+        oss << "FacilityName: " << fac->getName()<< "\n";
+        oss << "FacilityStatus: " << fac->getStatusString()<< "\n";
     }
     return oss.str();
 }
@@ -153,17 +156,20 @@ Plan::Plan(const Plan &other)
       settlement(other.settlement),
       selectionPolicy(other.selectionPolicy ? other.selectionPolicy->clone() : nullptr), // Deep copy selectionPolicy
       status(other.status),
+      facilities(), 
+      underConstruction(),
       facilityOptions(other.facilityOptions),
       life_quality_score(other.life_quality_score),
       economy_score(other.economy_score),
-      environment_score(other.environment_score)
-{
+      environment_score(other.environment_score) {
     // Deep copy the facilities vector
-    for (int i = 0; i < other.facilities.size(); i++)
+    for (std::vector<Facility*>::size_type i = 0; i < other.facilities.size(); ++i)
     {
         facilities.push_back(other.facilities.at(i)->clone());
     }
-    for (int i = 0; i < other.underConstruction.size(); i++)
+
+    // Deep copy the underConstruction vector
+    for (std::vector<Facility*>::size_type i = 0; i < other.underConstruction.size(); ++i)
     {
         underConstruction.push_back(other.underConstruction.at(i)->clone());
     }

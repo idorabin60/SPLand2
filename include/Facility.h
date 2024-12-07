@@ -28,6 +28,7 @@ public:
     int getEconomyScore() const;
     FacilityCategory getCategory() const;
     virtual FacilityType *clone() const;
+    virtual ~FacilityType() = default;
 
 protected:
     const string name;
@@ -49,9 +50,11 @@ public:
     FacilityStatus step();
     void setStatus(FacilityStatus status);
     const FacilityStatus &getStatus() const;
+    const string getStatusString() const; 
     const string toString() const;
     Facility *clone() const override;
     static std::string facilityCategoryToString(FacilityCategory category); // Make it static
+    virtual ~Facility() = default;
 
 private:
     const string settlementName;

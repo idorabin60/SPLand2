@@ -14,7 +14,7 @@ const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &f
 }
 const string NaiveSelection::toString() const
 {
-    return "Naive selection";
+    return "naiv";
 }
 
 NaiveSelection *NaiveSelection::clone() const
@@ -63,7 +63,7 @@ const FacilityType &BalancedSelection::selectFacility(const std::vector<Facility
 }
 const string BalancedSelection::toString() const
 {
-    return "Blanced Selection";
+    return "bal";
 }
 BalancedSelection *BalancedSelection::clone() const
 {
@@ -79,7 +79,7 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
         throw std::runtime_error("No facilities available to select from.");
     }
 
-    for (int i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
+    for (std::vector<FacilityType>::size_type i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
     {
         if (facilitiesOptions[i].getCategory() == FacilityCategory::ECONOMY)
         {
@@ -106,7 +106,7 @@ EconomySelection *EconomySelection::clone() const
 }
 const string EconomySelection::toString() const
 {
-    return "Econemy Selection";
+    return "eco";
 }
 // Sustainable selection:
 SustainabilitySelection::SustainabilitySelection() : lastSelectedIndex(0) {};
@@ -117,7 +117,7 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
         throw std::runtime_error("No facilities available to select from.");
     }
 
-    for (int i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
+    for (std::vector<FacilityType>::size_type i = lastSelectedIndex; i < facilitiesOptions.size(); i++)
     {
         if (facilitiesOptions[i].getCategory() == FacilityCategory::ENVIRONMENT)
         {
@@ -144,5 +144,5 @@ SustainabilitySelection *SustainabilitySelection::clone() const
 }
 const string SustainabilitySelection::toString() const
 {
-    return "Sustainable Selection";
+    return "sus";
 }

@@ -17,7 +17,8 @@ Simulation *backupSim = nullptr;
 
 // Constructor
 Simulation::Simulation(const std::string &configFilePath)
-    : isRunning(false), planCounter(0) // Initialize fields
+    : isRunning(false), planCounter(0), 
+    actionsLog(), plans(), settlements(), facilitiesOptions()
 {
     parseConfig(configFilePath);
 }
@@ -169,6 +170,7 @@ void Simulation::start()
         std::getline(std::cin, action); // Use getline to capture the entire input line
         if (action == "close")
         {
+            close();
             std::cout << "Simulation finished." << std::endl;
             break; // Exit the loop if user types "close"
         }
@@ -192,8 +194,11 @@ void Simulation::step()
 void Simulation::close()
 {
     isRunning = false;
+    for (Plan &element : plans){
+        PrintPlanStatus planPrint = PrintPlanStatus(element.getPlanId());
+        planPrint.act(*this);
+    }
 }
-
 // Create SelectionPolicy based on input string
 SelectionPolicy *Simulation::createSelectionPolicy(const std::string &policyType)
 {
@@ -247,7 +252,7 @@ void Simulation::printInitialState() const
 Plan &Simulation::getPlan(const int planID)
 {
     // Check if the planID is within valid bounds
-    if (planID < 0 || planID >= plans.size())
+    if (planID < 0 ||  static_cast<std::size_t>(planID) >= plans.size())
     {
         std::cout << "Invalid plan ID" << std::endl;
     }
@@ -271,6 +276,10 @@ void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectio
     plans.push_back((new_plan));
     planCounter++;
 }
+void Simulation::addAction(BaseAction *action)
+{
+   actionsLog.push_back(action);
+}
 ////
 bool Simulation::addSettlement(Settlement *settlement)
 {
@@ -290,6 +299,17 @@ bool Simulation::isSettlementExists(const string &settlementName)
     }
     return false;
 }
+bool Simulation::isPlanIdExsits(const int planID)
+{
+    for (Plan &element : plans)
+    {
+        if (element.getPlanId() == planID)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 bool Simulation::addFacility(FacilityType facility)
 {
     for (FacilityType fac : facilitiesOptions)
@@ -303,21 +323,17 @@ bool Simulation::addFacility(FacilityType facility)
     return true;
 }
 
-// parsing string method:
-std::vector<std::string> parseToWords(const std::string &input)
-{
+// Function to split a string into words
+std::vector<std::string> Simulation::parseToWords(const std::string& input) {
     std::vector<std::string> words;
     std::istringstream stream(input);
     std::string word;
-
-    // Extract each word and add to the vector
-    while (stream >> word)
-    {
+    while (stream >> word) {
         words.push_back(word);
     }
-
     return words;
 }
+
 // Create an action handler
 void Simulation::actionHandler(const std::string &action)
 {
@@ -329,8 +345,9 @@ void Simulation::actionHandler(const std::string &action)
         BaseAction *clonedRestore = printLog.clone();
         actionsLog.push_back(clonedRestore);
     }
-    if (words[0] == "settlement")
+   else if (words[0] == "settlement")
     {
+        if (!isSettlementExists(words[1])){
         if (words[2] == "0")
         {
             AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::VILLAGE);
@@ -352,6 +369,19 @@ void Simulation::actionHandler(const std::string &action)
             BaseAction *clonedRestore = settlemntToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
+        else {
+            AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::CITY);
+            settlemntToBeAdded.errorChange();
+            BaseAction *clonedRestore = settlemntToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
+        }
+        }
+        else{
+            AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::CITY);
+            settlemntToBeAdded.errorChange();
+            BaseAction *clonedRestore = settlemntToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
+        }
     }
     else if (words[0] == "restore")
     {
@@ -359,6 +389,7 @@ void Simulation::actionHandler(const std::string &action)
         restoreToDo.act(*this);
         BaseAction *clonedRestore = restoreToDo.clone();
         actionsLog.push_back(clonedRestore);
+
     }
     else if (words[0] == "facility")
     {
@@ -369,34 +400,33 @@ void Simulation::actionHandler(const std::string &action)
             BaseAction *clonedRestore = faccilityToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
-        if (words[2] == "1")
+       else if (words[2] == "1")
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ECONOMY, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
             BaseAction *clonedRestore = faccilityToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
-        if (words[2] == "2")
+        else if (words[2] == "2")
         {
             AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ENVIRONMENT, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
             faccilityToBeAdded.act(*this);
             BaseAction *clonedRestore = faccilityToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
+        else {
+            AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ENVIRONMENT, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
+            faccilityToBeAdded.errorFacilityCatagory();
+            BaseAction *clonedRestore = faccilityToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
+        }
     }
     else if (words[0] == "plan")
     {
-        if (isSettlementExists(words[1]))
-        {
             AddPlan planToBeAdded(words[1], words[2]);
             planToBeAdded.act(*this);
             BaseAction *clonedRestore = planToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
-        }
-        else
-        {
-            std::cout << "No settlement like this" << std::endl;
-        }
     }
 
     else if (words[0] == "backup")
@@ -414,19 +444,22 @@ void Simulation::actionHandler(const std::string &action)
         BaseAction *clonedRestore = planStatusToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
     }
-    if (words[0] == "step")
+    else if (words[0] == "step")
     {
         SimulateStep simulateStepToBeAdded = SimulateStep(std::stoi(words[1]));
         simulateStepToBeAdded.act(*this);
         BaseAction *clonedRestore = simulateStepToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
     }
-    if (words[0] == "changePlanPoliciy")
+    else if (words[0] == "changePlanPoliciy")
     {
         ChangePlanPolicy changePlanPolicyToBeAdded = ChangePlanPolicy(std::stoi(words[1]), words[2]);
         changePlanPolicyToBeAdded.act(*this);
         BaseAction *clonedRestore = changePlanPolicyToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
+    }
+    else {
+         std::cout << "--Unrecognized action !!-- Type again" << std::endl;
     }
 }
 
@@ -474,6 +507,9 @@ Simulation::~Simulation()
 Simulation::Simulation(const Simulation &other)
     : isRunning(other.isRunning),
       planCounter(other.planCounter),
+      actionsLog(),
+      plans(),
+      settlements(),
       facilitiesOptions(other.facilitiesOptions)
 {
     // Deep copy actionsLog
@@ -599,15 +635,16 @@ void Simulation::backup()
     backupSim = new Simulation(*this); // Uses the copy constructor
 }
 
-void Simulation::restore()
+bool Simulation::restore()
 {
-    if (backupSim == nullptr)
-    {
-        std::cout << "No backup available!" << std::endl;
-        return;
+    if (backupSim == nullptr){
+      return false; 
     }
+   else {
     // Restore the state from the backup
     *this = *backupSim; // Uses the copy assignment operator
+   return true; 
+   }
 }
 Simulation &Simulation::operator=(const Simulation &other)
 {

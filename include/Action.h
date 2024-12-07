@@ -64,6 +64,7 @@ public:
     void act(Simulation &simulation) override;
     AddSettlement *clone() const override;
     const string toString() const override;
+    void errorChange(); 
 
 private:
     const string settlementName;
@@ -77,6 +78,7 @@ public:
     void act(Simulation &simulation) override;
     AddFacility *clone() const override;
     const string toString() const override;
+    void errorFacilityCatagory();
 
 private:
     const string facilityName;

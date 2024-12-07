@@ -323,21 +323,17 @@ bool Simulation::addFacility(FacilityType facility)
     return true;
 }
 
-// parsing string method:
-std::vector<std::string> parseToWords(const std::string &input)
-{
+// Function to split a string into words
+std::vector<std::string> Simulation::parseToWords(const std::string& input) {
     std::vector<std::string> words;
     std::istringstream stream(input);
     std::string word;
-
-    // Extract each word and add to the vector
-    while (stream >> word)
-    {
+    while (stream >> word) {
         words.push_back(word);
     }
-
     return words;
 }
+
 // Create an action handler
 void Simulation::actionHandler(const std::string &action)
 {
@@ -373,9 +369,18 @@ void Simulation::actionHandler(const std::string &action)
             BaseAction *clonedRestore = settlemntToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
+        else {
+            AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::CITY);
+            settlemntToBeAdded.errorChange();
+            BaseAction *clonedRestore = settlemntToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
+        }
         }
         else{
-             std::cout << "Error: settlement already exists." << std::endl;
+            AddSettlement settlemntToBeAdded = AddSettlement(words[1], SettlementType::CITY);
+            settlemntToBeAdded.errorChange();
+            BaseAction *clonedRestore = settlemntToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
         }
     }
     else if (words[0] == "restore")
@@ -384,6 +389,7 @@ void Simulation::actionHandler(const std::string &action)
         restoreToDo.act(*this);
         BaseAction *clonedRestore = restoreToDo.clone();
         actionsLog.push_back(clonedRestore);
+
     }
     else if (words[0] == "facility")
     {
@@ -408,20 +414,19 @@ void Simulation::actionHandler(const std::string &action)
             BaseAction *clonedRestore = faccilityToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
         }
+        else {
+            AddFacility faccilityToBeAdded = AddFacility(words[1], FacilityCategory::ENVIRONMENT, std::stoi(words[3]), std::stoi(words[4]), std::stoi(words[5]), std::stoi(words[6]));
+            faccilityToBeAdded.errorFacilityCatagory();
+            BaseAction *clonedRestore = faccilityToBeAdded.clone();
+            actionsLog.push_back(clonedRestore);
+        }
     }
     else if (words[0] == "plan")
     {
-        if (isSettlementExists(words[1]))
-        {
             AddPlan planToBeAdded(words[1], words[2]);
             planToBeAdded.act(*this);
             BaseAction *clonedRestore = planToBeAdded.clone();
             actionsLog.push_back(clonedRestore);
-        }
-        else
-        {
-            std::cout << "Error: No settlement like this." << std::endl;
-        }
     }
 
     else if (words[0] == "backup")
@@ -434,40 +439,24 @@ void Simulation::actionHandler(const std::string &action)
 
     else if (words[0] == "planStatus")
     {
-        if(isPlanIdExsits(std::stoi(words[1])))
-        {
         PrintPlanStatus planStatusToBeAdded = PrintPlanStatus(std::stoi(words[1]));
         planStatusToBeAdded.act(*this);
         BaseAction *clonedRestore = planStatusToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
-        }
-        else{
-             std::cout << "Error: Plan doesn't exist" << std::endl;
-        }
     }
     else if (words[0] == "step")
     {
-        if ((std::stoi(words[1]))>0){
         SimulateStep simulateStepToBeAdded = SimulateStep(std::stoi(words[1]));
         simulateStepToBeAdded.act(*this);
         BaseAction *clonedRestore = simulateStepToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
-        }
-        else{
-             std::cout << "Error: Entering a number of illegal steps." << std::endl;
-        }
     }
     else if (words[0] == "changePlanPoliciy")
     {
-        if (isPlanIdExsits(std::stoi(words[1])) &&(words[2] == "bal" || words[2]=="eco" || words[2]== "naiv")) {
         ChangePlanPolicy changePlanPolicyToBeAdded = ChangePlanPolicy(std::stoi(words[1]), words[2]);
         changePlanPolicyToBeAdded.act(*this);
         BaseAction *clonedRestore = changePlanPolicyToBeAdded.clone();
         actionsLog.push_back(clonedRestore);
-        }
-        else {
-             std::cout << "Error: There is no planId like this, or dont have policy like this." << std::endl;
-        }
     }
     else {
          std::cout << "--Unrecognized action !!-- Type again" << std::endl;
@@ -646,15 +635,16 @@ void Simulation::backup()
     backupSim = new Simulation(*this); // Uses the copy constructor
 }
 
-void Simulation::restore()
+bool Simulation::restore()
 {
-    if (backupSim == nullptr)
-    {
-        std::cout << "No backup available!" << std::endl;
-        return;
+    if (backupSim == nullptr){
+      return false; 
     }
+   else {
     // Restore the state from the backup
     *this = *backupSim; // Uses the copy assignment operator
+   return true; 
+   }
 }
 Simulation &Simulation::operator=(const Simulation &other)
 {

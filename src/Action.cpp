@@ -35,11 +35,16 @@ SimulateStep::SimulateStep(const int numOfSteps) : BaseAction(), numOfSteps(numO
 
 void SimulateStep::act(Simulation &simulation)
 {
+    if (numOfSteps>0){
     for (int i = 1; i <= numOfSteps; i++)
     {
         simulation.step();
     }
     complete();
+    }
+    else {
+        error(" Entering a number of illegal steps.");
+    }
 }
 
 const string SimulateStep::toString() const
@@ -62,10 +67,14 @@ PrintPlanStatus::PrintPlanStatus(int planId)
 
 void PrintPlanStatus::act(Simulation &simulation)
 {
+    if (simulation.isPlanIdExsits(planId)){
     Plan this_plan = simulation.getPlan(planId);
     std::cout << this_plan.toString() << std::endl;
-    ;
     complete();
+    }
+    else {
+        error("Plan doesn't exist");
+    }
 }
 PrintPlanStatus *PrintPlanStatus::clone() const
 {
@@ -88,26 +97,44 @@ void AddPlan::act(Simulation &simulation)
 {
     Settlement &settlement_to_addPlan = simulation.getSettlement(settlementName);
     SelectionPolicy *wanted_policy = nullptr;
-    if (selectionPolicy == "bal")
+   if (simulation.isSettlementExists(settlementName)){
+      
+      if (selectionPolicy == "bal"){
         wanted_policy = new BalancedSelection(0, 0, 0);
-    else if (selectionPolicy == "eco")
+        simulation.addPlan(settlement_to_addPlan, wanted_policy);
+        complete();
+      }
+      else if (selectionPolicy == "eco"){
         wanted_policy = new EconomySelection();
-    else if (selectionPolicy == "sus")
+        simulation.addPlan(settlement_to_addPlan, wanted_policy);
+        complete();
+      }
+      else if (selectionPolicy == "sus"){
         wanted_policy = new SustainabilitySelection();
-    else
+        simulation.addPlan(settlement_to_addPlan, wanted_policy);
+        complete();
+      }
+      else if (selectionPolicy == "naiv"){
         wanted_policy = new NaiveSelection();
-
-    simulation.addPlan(settlement_to_addPlan, wanted_policy);
-    complete();
+        simulation.addPlan(settlement_to_addPlan, wanted_policy);
+        complete();
+      }
+    else {
+        error("no selection policiy like this.");
+        }
+   }
+   else {
+    error ("no settlement like this");
+   }
 }
 
 const string AddPlan::toString() const
 {
 
     if (getStatus() == ActionStatus::ERROR)
-        return ("Action: AddPlan ERROR");
+        return ("Action: AddPlan " + settlementName+ " (settlement) ERROR");
     else
-        return ("Action: AddPlan COMPLETED");
+        return ("Action: AddPlan " + settlementName + " (settlement) COMPLETED");
 }
 
 AddPlan *AddPlan::clone() const
@@ -138,6 +165,10 @@ void AddSettlement::act(Simulation &simulation)
         error("Settlement already exsite");
     }
 }
+
+void AddSettlement::errorChange(){
+    error("settlement-already exists or policy unvalid.");
+}
 AddSettlement *AddSettlement::clone() const
 {
     return new AddSettlement(*this);
@@ -145,9 +176,9 @@ AddSettlement *AddSettlement::clone() const
 const string AddSettlement::toString() const
 {
     if (getStatus() == ActionStatus::ERROR)
-        return ("Action: AddSettlement ERROR!");
+        return ("Action: AddSettlement " + settlementName + " ERROR!");
     else
-        return ("Action: AddSettlement COMPLETED!");
+        return ("Action: AddSettlement " + settlementName + " COMPLETED!");
 }
 
 //--------------------------//////
@@ -174,8 +205,13 @@ void AddFacility::act(Simulation &simulation)
     if (simulation.addFacility(new_facility))
         complete();
     else
-        std::cout << "Error!!" << std::endl;
+         error("Facility already exsite");
 }
+
+void AddFacility::errorFacilityCatagory(){
+    error("no facility catagory like this. Facility not added..");
+}
+
 AddFacility *AddFacility::clone() const
 {
     return new AddFacility(*this);
@@ -183,9 +219,9 @@ AddFacility *AddFacility::clone() const
 const string AddFacility::toString() const
 {
     if (getStatus() == ActionStatus::ERROR)
-        return ("Action: AddFacility ERROR!");
+        return ("Action: AddFacility: " + facilityName +" ERROR");
     else
-        return ("Action: AddFacility COMPLETED!");
+        return ("Action: AddFacility: " + facilityName +  " COMPLETED");
 }
 
 //--------------------------//////
@@ -196,17 +232,38 @@ ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy)
 
 void ChangePlanPolicy::act(Simulation &simulation)
 {
+    if (!simulation.isPlanIdExsits(planId)) 
+       error ("no planId like this.");
+    else {
     Plan &to_change = simulation.getPlan(planId);
+    if (to_change.getSelectionPolicy()->toString()==newPolicy){
+        error ("the plan alredy have this policy.");
+    }
     SelectionPolicy *wanted_policy = nullptr;
-    if (newPolicy == "bal")
+    if (newPolicy == "bal"){
         wanted_policy = new BalancedSelection(to_change.getlifeQualityScore(), to_change.getEconomyScore(), to_change.getEnvironmentScore());
-    else if (newPolicy == "eco")
+        to_change.setSelectionPolicy(wanted_policy);
+        complete();
+    }
+    else if (newPolicy == "eco"){
         wanted_policy = new EconomySelection();
-    else if (newPolicy == "sus")
+         to_change.setSelectionPolicy(wanted_policy);
+         complete();   
+    }
+    else if (newPolicy == "sus"){
         wanted_policy = new SustainabilitySelection();
-    else
+         to_change.setSelectionPolicy(wanted_policy);
+        complete();
+    }
+    else if (newPolicy == "naiv"){
         wanted_policy = new NaiveSelection();
-    to_change.setSelectionPolicy(wanted_policy);
+       to_change.setSelectionPolicy(wanted_policy);
+      complete();
+    }
+    else {
+        error ("enter unvaild policy.");
+    }
+    }
 }
 ChangePlanPolicy *ChangePlanPolicy::clone() const
 {
@@ -215,9 +272,9 @@ ChangePlanPolicy *ChangePlanPolicy::clone() const
 const string ChangePlanPolicy::toString() const
 {
     if (getStatus() == ActionStatus::ERROR)
-        return ("Action: ChangePlanPolicy ERROR!");
+        return ("Action: ChangePlanPolicy " + std::to_string(planId) + " ERROR.");
     else
-        return ("Action: ChangePlanPolicy COMPLETED!");
+        return ("Action: ChangePlanPolicy "+ std::to_string(planId) + " COMPLETED.");
 }
 
 //--------------------------//////
@@ -273,8 +330,12 @@ RestoreSimulation::RestoreSimulation() {}
 // Action method
 void RestoreSimulation::act(Simulation &simulation)
 {
-    simulation.restore();
-    complete();
+    if( simulation.restore()) {
+    complete(); 
+    }
+    else {
+        error("No backup available");
+    }
 }
 
 // Clone method

@@ -32,10 +32,11 @@ public:
     void printInitialState() const;
     ~Simulation();
     SelectionPolicy *createSelectionPolicy(const std::string &policyType);
+    std::vector<std::string> parseToWords(const std::string& input);
     void actionHandler(const std::string &action);
     void printLog() const;
     void backup();
-    void restore();
+    bool restore();
     //rule of 5
     Simulation(const Simulation &other);
     Simulation &operator=(const Simulation &other);

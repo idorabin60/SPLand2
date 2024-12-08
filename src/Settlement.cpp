@@ -1,6 +1,6 @@
-#include "Settlement.h" // Assuming the header file is named "Settlement.h"
+#include "Settlement.h" 
 #include <iostream>
-#include <sstream> // For string formatting in toString()
+#include <sstream> 
 
 using namespace std;
 
@@ -20,12 +20,9 @@ SettlementType Settlement::getType() const
     return type;
 }
 
-// Get a string representation of the settlement
 const string Settlement::toString() const
 {
     string typeStr;
-
-    // Map the SettlementType enum to a string
     if (type == SettlementType::VILLAGE)
     {
         typeStr = "Village";
@@ -38,7 +35,5 @@ const string Settlement::toString() const
     {
         typeStr = "Metropolis";
     }
-
-    // Use simple concatenation to construct the output
     return "Settlement Name: " + name + "\n" + "Settlement Type: " + typeStr + "\n";
 }

@@ -239,6 +239,7 @@ void ChangePlanPolicy::act(Simulation &simulation)
     if (to_change.getSelectionPolicy()->toString()==newPolicy){
         error ("the plan alredy have this policy.");
     }
+    else{
     SelectionPolicy *wanted_policy = nullptr;
     if (newPolicy == "bal"){
         wanted_policy = new BalancedSelection(to_change.getlifeQualityScore(), to_change.getEconomyScore(), to_change.getEnvironmentScore());
@@ -264,6 +265,7 @@ void ChangePlanPolicy::act(Simulation &simulation)
         error ("enter unvaild policy.");
     }
     }
+    }
 }
 ChangePlanPolicy *ChangePlanPolicy::clone() const
 {
@@ -285,6 +287,7 @@ PrintActionsLog::PrintActionsLog() : BaseAction() {}
 void PrintActionsLog::act(Simulation &simulation)
 {
     simulation.printLog();
+    complete();
 }
 
 PrintActionsLog *PrintActionsLog::clone() const

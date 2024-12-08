@@ -1,7 +1,7 @@
 #include "Facility.h"
 #include <iostream>
-#include <sstream> // For string formatting in toString()
-
+#include <sstream>
+#include <string>
 using namespace std;
 
 // Constructor
@@ -34,7 +34,6 @@ FacilityCategory FacilityType::getCategory() const
 }
 FacilityType *FacilityType::clone() const
 {
-    // Return a new instance of FacilityType
     return new FacilityType(*this);
 }
 
@@ -117,22 +116,4 @@ const string Facility::toString() const
         << ", Status: " << facilityStatusToString(getStatus())
         << ", Time Left: " << getTimeLeft();
     return oss.str();
-}
-#include <string>
-#include <iostream>
-
-// Define the enum-to-string conversion function
-std::string Facility::facilityCategoryToString(FacilityCategory category)
-{
-    switch (category)
-    {
-    case FacilityCategory::LIFE_QUALITY:
-        return "Life Quality";
-    case FacilityCategory::ECONOMY:
-        return "Economy";
-    case FacilityCategory::ENVIRONMENT:
-        return "Environment";
-    default:
-        return "Unknown Category";
-    }
 }

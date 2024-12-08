@@ -29,7 +29,6 @@ public:
     void close();
     void open();
     void parseConfigFile(const std::string &configFilePath);
-    void printInitialState() const;
     ~Simulation();
     SelectionPolicy *createSelectionPolicy(const std::string &policyType);
     std::vector<std::string> parseToWords(const std::string& input);

@@ -20,11 +20,241 @@ Simulation::Simulation(const std::string &configFilePath)
     : isRunning(false), planCounter(0), 
     actionsLog(), plans(), settlements(), facilitiesOptions()
 {
-    parseConfig(configFilePath);
+    parseConfigFile(configFilePath);
+}
+
+// Copy constructor
+Simulation::Simulation(const Simulation &other)
+    : isRunning(other.isRunning),
+      planCounter(other.planCounter),
+      actionsLog(),
+      plans(),
+      settlements(),
+      facilitiesOptions(other.facilitiesOptions)
+{
+    // Deep copy actionsLog
+    for (auto *action : other.actionsLog)
+    {
+        actionsLog.push_back(action->clone());
+    }
+
+    // Deep copy settlements
+    for (auto *settlement : other.settlements)
+    {
+        settlements.push_back(new Settlement(*settlement));
+    }
+
+    // Deep copy plans
+    for (const auto &plan : other.plans)
+    {
+        const std::string &settlementName = plan.getSettlement();
+        Settlement *newSettlement = nullptr;
+
+        // Find corresponding settlement
+        for (Settlement *copiedSettlement : settlements)
+        {
+            if (copiedSettlement->getName() == settlementName)
+            {
+                newSettlement = copiedSettlement;
+                break;
+            }
+        }
+
+        if (!newSettlement)
+        {
+            throw std::runtime_error("Settlement not found for Plan during copy constructor: " + settlementName);
+        }
+
+        // Deep copy facilities
+        std::vector<Facility *> copiedFacilities;
+        for (Facility *facility : plan.getFacilities())
+        {
+            copiedFacilities.push_back(facility->clone());
+        }
+
+        // Deep copy underConstruction
+        std::vector<Facility *> copiedUnderConstruction;
+        for (Facility *facility : plan.getUnderConstruction())
+        {
+            copiedUnderConstruction.push_back(facility->clone());
+        }
+
+        // Reconstruct the Plan
+        plans.emplace_back(
+            plan.getPlanId(),
+            *newSettlement, // Deep-copied settlement
+            plan.getSelectionPolicy() ? plan.getSelectionPolicy()->clone() : nullptr,
+            facilitiesOptions,
+            plan.getlifeQualityScore(),
+            plan.getEconomyScore(),
+            plan.getEnvironmentScore(),
+            std::move(copiedFacilities),       // Transfer ownership
+            std::move(copiedUnderConstruction) // Transfer ownership
+        );
+    }
+}
+
+
+//copy assignment operator
+Simulation &Simulation::operator=(const Simulation &other)
+{
+    if (this == &other)
+    {
+        return *this; // Prevent self-assignment
+    }
+
+    // Cleanup current resources
+    for (BaseAction *action : actionsLog)
+    {
+        delete action;
+    }
+    actionsLog.clear();
+
+    for (Settlement *settlement : settlements)
+    {
+        delete settlement;
+    }
+    settlements.clear();
+
+    plans.clear();
+    facilitiesOptions.clear();
+
+    // Copy basic members
+    isRunning = other.isRunning;
+    planCounter = other.planCounter;
+    for (const FacilityType &facility : other.facilitiesOptions)
+    {
+        facilitiesOptions.push_back(facility); // Uses copy constructor
+    }
+    // Deep copy actionsLog
+    for (BaseAction *action : other.actionsLog)
+    {
+        actionsLog.push_back(action->clone());
+    }
+
+    // Deep copy settlements
+    for (Settlement *settlement : other.settlements)
+    {
+        settlements.push_back(new Settlement(*settlement));
+    }
+
+    // Deep copy plans
+    for (const auto &plan : other.plans)
+    {
+        Settlement *newSettlement = nullptr;
+        for (Settlement *copiedSettlement : settlements)
+        {
+            if (copiedSettlement->getName() == plan.getSettlement())
+            {
+                newSettlement = copiedSettlement;
+                break;
+            }
+        }
+        if (!newSettlement)
+        {
+            throw std::runtime_error("Settlement not found during copy assignment.");
+        }
+
+        std::vector<Facility *> copiedFacilities;
+        for (Facility *facility : plan.getFacilities())
+        {
+            copiedFacilities.push_back(facility->clone());
+        }
+
+        std::vector<Facility *> copiedUnderConstruction;
+        for (Facility *facility : plan.getUnderConstruction())
+        {
+            copiedUnderConstruction.push_back(facility->clone());
+        }
+
+        plans.emplace_back(
+            plan.getPlanId(),
+            *newSettlement,
+            plan.getSelectionPolicy() ? plan.getSelectionPolicy()->clone() : nullptr,
+            facilitiesOptions,
+            plan.getlifeQualityScore(),
+            plan.getEconomyScore(),
+            plan.getEnvironmentScore(),
+            std::move(copiedFacilities),
+            std::move(copiedUnderConstruction));
+    }
+
+    return *this;
+}
+
+
+// Move constructor
+Simulation::Simulation(Simulation &&other) noexcept
+    : isRunning(other.isRunning),
+      planCounter(other.planCounter),
+      actionsLog(std::move(other.actionsLog)),
+      plans(std::move(other.plans)),
+      settlements(std::move(other.settlements)),
+      facilitiesOptions(std::move(other.facilitiesOptions))
+{
+
+    other.isRunning = false;
+    other.planCounter = 0;
+}
+
+// Move assignment operator
+Simulation &Simulation::operator=(Simulation &&other) noexcept
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    // Cleanup current resources
+    for (auto *action : actionsLog)
+    {
+        delete action;
+    }
+    for (auto *settlement : settlements)
+    {
+        delete settlement;
+    }
+
+    actionsLog.clear();
+    settlements.clear();
+
+    // Move data
+    isRunning = other.isRunning;
+    planCounter = other.planCounter;
+    actionsLog = std::move(other.actionsLog);
+    plans = std::move(other.plans);
+    settlements = std::move(other.settlements);
+    facilitiesOptions = std::move(other.facilitiesOptions);
+
+    // Nullify the moved-from object's state
+    other.isRunning = false;
+    other.planCounter = 0;
+
+    return *this;
+}
+
+// Destructor
+Simulation::~Simulation()
+{
+    for (BaseAction *action : actionsLog)
+    {
+        if (action)
+            delete action;
+        action = nullptr;
+    }
+    for (Settlement *settlement : settlements)
+    {
+        if (settlement)
+            delete settlement;
+        settlement = nullptr;
+    }
+    settlements.clear(); // Clear the vector
+    plans.clear();
+    facilitiesOptions.clear(); 
 }
 
 // Function to parse configuration file
-void Simulation::parseConfig(const std::string &configFilePath)
+void Simulation::parseConfigFile(const std::string &configFilePath)
 {
     std::ifstream configFile(configFilePath);
     if (!configFile.is_open())
@@ -167,19 +397,19 @@ void Simulation::start()
     while (true)
     {
         std::cout << "Type an action (or 'close' to stop): ";
-        std::getline(std::cin, action); // Use getline to capture the entire input line
+        std::getline(std::cin, action); 
         if (action == "close")
         {
             close();
             std::cout << "Simulation finished." << std::endl;
-            break; // Exit the loop if user types "close"
+            break; 
         }
 
-        actionHandler(action); // Handle the full line of input
+        actionHandler(action);
     }
     delete backupSim;
 
-    isRunning = false; // Mark simulation as stopped
+    isRunning = false; 
 }
 
 void Simulation::step()
@@ -204,7 +434,7 @@ SelectionPolicy *Simulation::createSelectionPolicy(const std::string &policyType
 {
     if (policyType == "bal")
     {
-        return new BalancedSelection(0, 0, 0); // Example default scores
+        return new BalancedSelection(0, 0, 0); 
     }
     else if (policyType == "eco")
     {
@@ -213,40 +443,6 @@ SelectionPolicy *Simulation::createSelectionPolicy(const std::string &policyType
     else
     {
         return new NaiveSelection();
-    }
-}
-
-// Function to print the initial state of the Simulation
-void Simulation::printInitialState() const
-{
-    if (settlements.empty())
-    {
-        std::cout << "  None" << std::endl;
-    }
-    else
-    {
-        for (const auto &settlement : settlements)
-        {
-            std::cout << settlement->toString() << std::endl;
-        }
-    }
-
-    std::cout << "Facilities Options:" << std::endl;
-    if (facilitiesOptions.empty())
-    {
-        std::cout << "  None" << std::endl;
-    }
-    else
-    {
-        for (const auto &facility : facilitiesOptions)
-        {
-            std::cout << "  Name: " << facility.getName()
-                      << "  Category: " << Facility::facilityCategoryToString(facility.getCategory()) << "\n"
-                      << ", Price: " << facility.getCost()
-                      << ", Life Quality Score: " << facility.getLifeQualityScore()
-                      << ", Economy Score: " << facility.getEconomyScore()
-                      << ", Environment Score: " << facility.getEnvironmentScore() << std::endl;
-        }
     }
 }
 Plan &Simulation::getPlan(const int planID)
@@ -280,7 +476,6 @@ void Simulation::addAction(BaseAction *action)
 {
    actionsLog.push_back(action);
 }
-////
 bool Simulation::addSettlement(Settlement *settlement)
 {
     // asumme that that settlement dosent exsit
@@ -471,158 +666,6 @@ void Simulation::printLog() const
     }
 }
 
-//   // Destructor
-//     ~Simulation();
-//     // Copy constructor
-//     Simulation(const Simulation &other);
-//     // Copy assignment operator
-//     Simulation &operator=(const Simulation &other);
-//     // Move constructor
-//     Simulation(Simulation &&other) noexcept;
-//     // Move assignment operator
-//     Simulation &operator=(Simulation &&other) noexcept;
-
-// //// RULE OF 5
-// Destructor
-Simulation::~Simulation()
-{
-    for (BaseAction *action : actionsLog)
-    {
-        if (action)
-            delete action;
-        action = nullptr;
-    }
-    for (Settlement *settlement : settlements)
-    {
-        if (settlement)
-            delete settlement;
-        settlement = nullptr;
-    }
-    settlements.clear(); // Clear the vector
-    plans.clear();
-    facilitiesOptions.clear(); // Destructor of each FacilityType is automatically called
-}
-
-// Copy constructor
-Simulation::Simulation(const Simulation &other)
-    : isRunning(other.isRunning),
-      planCounter(other.planCounter),
-      actionsLog(),
-      plans(),
-      settlements(),
-      facilitiesOptions(other.facilitiesOptions)
-{
-    // Deep copy actionsLog
-    for (auto *action : other.actionsLog)
-    {
-        actionsLog.push_back(action->clone());
-    }
-
-    // Deep copy settlements
-    for (auto *settlement : other.settlements)
-    {
-        settlements.push_back(new Settlement(*settlement));
-    }
-
-    // Deep copy plans
-    for (const auto &plan : other.plans)
-    {
-        const std::string &settlementName = plan.getSettlement();
-        Settlement *newSettlement = nullptr;
-
-        // Find corresponding settlement
-        for (Settlement *copiedSettlement : settlements)
-        {
-            if (copiedSettlement->getName() == settlementName)
-            {
-                newSettlement = copiedSettlement;
-                break;
-            }
-        }
-
-        if (!newSettlement)
-        {
-            throw std::runtime_error("Settlement not found for Plan during copy constructor: " + settlementName);
-        }
-
-        // Deep copy facilities
-        std::vector<Facility *> copiedFacilities;
-        for (Facility *facility : plan.getFacilities())
-        {
-            copiedFacilities.push_back(facility->clone());
-        }
-
-        // Deep copy underConstruction
-        std::vector<Facility *> copiedUnderConstruction;
-        for (Facility *facility : plan.getUnderConstruction())
-        {
-            copiedUnderConstruction.push_back(facility->clone());
-        }
-
-        // Reconstruct the Plan
-        plans.emplace_back(
-            plan.getPlanId(),
-            *newSettlement, // Deep-copied settlement
-            plan.getSelectionPolicy() ? plan.getSelectionPolicy()->clone() : nullptr,
-            facilitiesOptions,
-            plan.getlifeQualityScore(),
-            plan.getEconomyScore(),
-            plan.getEnvironmentScore(),
-            std::move(copiedFacilities),       // Transfer ownership
-            std::move(copiedUnderConstruction) // Transfer ownership
-        );
-    }
-}
-// Move constructor
-Simulation::Simulation(Simulation &&other) noexcept
-    : isRunning(other.isRunning),
-      planCounter(other.planCounter),
-      actionsLog(std::move(other.actionsLog)),
-      plans(std::move(other.plans)),
-      settlements(std::move(other.settlements)),
-      facilitiesOptions(std::move(other.facilitiesOptions))
-{
-    // Nullify the moved-from object's state
-    other.isRunning = false;
-    other.planCounter = 0;
-}
-
-// Move assignment operator
-Simulation &Simulation::operator=(Simulation &&other) noexcept
-{
-    if (this == &other)
-    {
-        return *this;
-    }
-
-    // Cleanup current resources
-    for (auto *action : actionsLog)
-    {
-        delete action;
-    }
-    for (auto *settlement : settlements)
-    {
-        delete settlement;
-    }
-
-    actionsLog.clear();
-    settlements.clear();
-
-    // Move data
-    isRunning = other.isRunning;
-    planCounter = other.planCounter;
-    actionsLog = std::move(other.actionsLog);
-    plans = std::move(other.plans);
-    settlements = std::move(other.settlements);
-    facilitiesOptions = std::move(other.facilitiesOptions);
-
-    // Nullify the moved-from object's state
-    other.isRunning = false;
-    other.planCounter = 0;
-
-    return *this;
-}
-
 void Simulation::backup()
 {
     // If there's an existing backup, delete it to avoid memory leaks
@@ -646,88 +689,4 @@ bool Simulation::restore()
    return true; 
    }
 }
-Simulation &Simulation::operator=(const Simulation &other)
-{
-    if (this == &other)
-    {
-        return *this; // Prevent self-assignment
-    }
 
-    // Cleanup current resources
-    for (BaseAction *action : actionsLog)
-    {
-        delete action;
-    }
-    actionsLog.clear();
-
-    for (Settlement *settlement : settlements)
-    {
-        delete settlement;
-    }
-    settlements.clear();
-
-    plans.clear();
-    facilitiesOptions.clear();
-
-    // Copy basic members
-    isRunning = other.isRunning;
-    planCounter = other.planCounter;
-    for (const FacilityType &facility : other.facilitiesOptions)
-    {
-        facilitiesOptions.push_back(facility); // Uses copy constructor
-    }
-    // Deep copy actionsLog
-    for (BaseAction *action : other.actionsLog)
-    {
-        actionsLog.push_back(action->clone());
-    }
-
-    // Deep copy settlements
-    for (Settlement *settlement : other.settlements)
-    {
-        settlements.push_back(new Settlement(*settlement));
-    }
-
-    // Deep copy plans
-    for (const auto &plan : other.plans)
-    {
-        Settlement *newSettlement = nullptr;
-        for (Settlement *copiedSettlement : settlements)
-        {
-            if (copiedSettlement->getName() == plan.getSettlement())
-            {
-                newSettlement = copiedSettlement;
-                break;
-            }
-        }
-        if (!newSettlement)
-        {
-            throw std::runtime_error("Settlement not found during copy assignment.");
-        }
-
-        std::vector<Facility *> copiedFacilities;
-        for (Facility *facility : plan.getFacilities())
-        {
-            copiedFacilities.push_back(facility->clone());
-        }
-
-        std::vector<Facility *> copiedUnderConstruction;
-        for (Facility *facility : plan.getUnderConstruction())
-        {
-            copiedUnderConstruction.push_back(facility->clone());
-        }
-
-        plans.emplace_back(
-            plan.getPlanId(),
-            *newSettlement,
-            plan.getSelectionPolicy() ? plan.getSelectionPolicy()->clone() : nullptr,
-            facilitiesOptions,
-            plan.getlifeQualityScore(),
-            plan.getEconomyScore(),
-            plan.getEnvironmentScore(),
-            std::move(copiedFacilities),
-            std::move(copiedUnderConstruction));
-    }
-
-    return *this;
-}
